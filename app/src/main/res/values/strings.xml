@@ -3,4 +3,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="tap_anywhere">Tap anywhere on the screen to see the toolbar</string>
+    <string name="more">more</string>
+    <string name="back">back</string>
 </resources>

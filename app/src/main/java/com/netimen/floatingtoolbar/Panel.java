@@ -9,98 +9,110 @@ package com.netimen.floatingtoolbar;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+/**
+ * Contains the action views and layouts them so they fit the maximum width and distributes them to several containers navigable via more/back buttons if needed
+ * CUR animation & stretching
+ */
 public class Panel extends FrameLayout {
     private final ArrayAdapter<Integer> adapter;
-    private final int moreButtonRes;
-    private final int backButtonRes;
+    @LayoutRes
+    private final int moreButtonLayout, backButtonLayout;
 
-    private int currentPanelId;
+    private int currentContainerId;
 
-    public Panel(Context context, ArrayAdapter<Integer> adapter, @DrawableRes int moreButtonRes, @DrawableRes int backButtonRes) { // CUR change to @LayoutRes
+    public Panel(Context context, ArrayAdapter<Integer> adapter, @LayoutRes int moreButtonLayout, @LayoutRes int backButtonLayout) {
         super(context);
         this.adapter = adapter;
-        this.moreButtonRes = moreButtonRes;
-        this.backButtonRes = backButtonRes;
-        setBackgroundColor(Color.GRAY);
+        this.moreButtonLayout = moreButtonLayout;
+        this.backButtonLayout = backButtonLayout;
+        setBackgroundColor(Color.GRAY); // CUR
     }
 
     public void relayout(int containerWidth) {
         removeAllViews();
-        currentPanelId = 0;
-        int currentPanelWidth = 0;
+        currentContainerId = 0;
+        int currentContainerWidth = 0;
         for (int itemId = 0; itemId < adapter.getCount(); itemId++) {
-            final View view = adapter.getView(itemId, null, null);
-            view.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-            if (currentPanelWidth + view.getMeasuredWidth() > containerWidth) {
-                addViewToPanel(createMoreButton());
-                currentPanelId++; // CUR check if more button also doesn't fit
+            View actionView = adapter.getView(itemId, null, null);
+            actionView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+            if (currentContainerWidth + actionView.getMeasuredWidth() > containerWidth) {
+                final View moreButton = createMoreButton();
+                addViewToContainer(moreButton);
+                if (currentContainerWidth + moreButton.getMeasuredWidth() > containerWidth) { // if even 'more' button doesn't fit, we need to remove last action view and add it to the next container
+                    actionView = getCurrentContainer().getChildAt(getCurrentContainer().getChildCount() - 2); // last added action view
+                    getCurrentContainer().removeView(actionView);
+                    itemId--;
+                }
+                currentContainerId++;
             }
-            if (getCurrentPanel() == null) {
-                final LinearLayout innerPanel = new LinearLayout(getContext());
-                innerPanel.setOrientation(LinearLayout.HORIZONTAL);
-                innerPanel.setVisibility(GONE);
-                addView(innerPanel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                if (currentPanelId > 0) {
+
+            if (getCurrentContainer() == null) {
+                final LinearLayout container = new LinearLayout(getContext());
+                container.setOrientation(LinearLayout.HORIZONTAL);
+                container.setVisibility(GONE);
+                addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                if (currentContainerId > 0) {
                     final View backButton = createBackButton();
-                    addViewToPanel(backButton);
-                    currentPanelWidth = backButton.getMeasuredWidth();
+                    addViewToContainer(backButton);
+                    currentContainerWidth = backButton.getMeasuredWidth();
                 } else
-                    currentPanelWidth = 0;
+                    currentContainerWidth = 0;
             }
-            addViewToPanel(view);
-            currentPanelWidth += view.getMeasuredWidth();
+            addViewToContainer(actionView);
+            currentContainerWidth += actionView.getMeasuredWidth();
         }
-        showPanel(0);
+        showContainer(0);
     }
 
-    private void addViewToPanel(View view) {
-        getCurrentPanel().addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    private void addViewToContainer(View view) {
+        getCurrentContainer().addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
+
+    private void showContainer(int containerId) {
+        getCurrentContainer().setVisibility(GONE);
+        currentContainerId = containerId;
+        getCurrentContainer().setVisibility(VISIBLE);
+    }
+
+    ViewGroup getCurrentContainer() {
+        return (currentContainerId == -1 || currentContainerId >= getChildCount()) ? null : (ViewGroup) getChildAt(currentContainerId);
+    }
+
+    /// more/back buttons
 
     private View createBackButton() {
-        final View view = createSpecialButton(backButtonRes);
+        final View view = createSpecialButton(backButtonLayout);
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPanel(currentPanelId - 1);
+                showContainer(currentContainerId - 1);
             }
         });
         return view;
-    }
-
-    private void showPanel(int panelId) { // CUR rename
-        getCurrentPanel().setVisibility(GONE);
-        currentPanelId = panelId;
-        getCurrentPanel().setVisibility(VISIBLE);
     }
 
     private View createMoreButton() {
-        final View view = createSpecialButton(moreButtonRes);
+        final View view = createSpecialButton(moreButtonLayout);
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPanel(currentPanelId + 1);
+                showContainer(currentContainerId + 1);
             }
         });
         return view;
     }
 
-    private View createSpecialButton(@DrawableRes int drawableRes) {
-        final ImageView view = new ImageView(getContext());
-        view.setImageResource(drawableRes);
+    private View createSpecialButton(@LayoutRes int layoutRes) {
+        final View view = inflate(getContext(), layoutRes, null);
         view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         return view;
-    }
-
-    ViewGroup getCurrentPanel() {
-        return (currentPanelId == -1 || currentPanelId >= getChildCount()) ? null : (ViewGroup) getChildAt(currentPanelId);
     }
 }

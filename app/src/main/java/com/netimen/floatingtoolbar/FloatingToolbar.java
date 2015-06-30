@@ -12,6 +12,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -20,6 +21,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class FloatingToolbar extends FrameLayout {
+    private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
+    private int previousContainerWidth;
+
     public FloatingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -30,15 +34,19 @@ public class FloatingToolbar extends FrameLayout {
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                for (int i = 0; i < getChildCount(); i++)
-                    ((Panel)getChildAt(i)).relayout(((View) getParent()).getWidth());
-                getViewTreeObserver().removeOnGlobalLayoutListener(this); // CUR ; check parent size changed
+                final int containerWidth = ((View) getParent()).getWidth() - ((View) getParent()).getPaddingLeft() - ((View) getParent()).getPaddingRight();
+                Log.d(LOG_TAG, "onGlobalLayout: pW: " + previousContainerWidth + " w: " + containerWidth);
+                if (previousContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
+                    previousContainerWidth = containerWidth;
+                    for (int i = 0; i < getChildCount(); i++)
+                        ((Panel) getChildAt(i)).relayout(containerWidth);
+                }
             }
         });
     }
 
     public void addPanel(int[] actions) {
-        addView(new Panel(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions), R.drawable.abc_ab_share_pack_mtrl_alpha, R.drawable.abc_ab_share_pack_mtrl_alpha), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addView(new Panel(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions), R.layout.more_button, R.layout.back_button), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public void show(Point position) { // CUR

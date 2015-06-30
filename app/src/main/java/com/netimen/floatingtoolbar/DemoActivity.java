@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -24,8 +25,9 @@ public class DemoActivity extends AppCompatActivity {
 
     @AfterViews
     void ready() {
+        mainContainer.setClipChildren(false);
         floatingToolbar = new FloatingToolbar<>(this);
-        floatingToolbar.addPanel(new Integer[]{1, 2, 3, 4, 5, 6});
+        floatingToolbar.addPanel(new TestAdapter());
         floatingToolbar.setListener(new FloatingToolbar.Listener<Integer>() {
             @Override
             public void actionSelected(Integer action) {
@@ -39,9 +41,31 @@ public class DemoActivity extends AppCompatActivity {
     @Touch
     void mainContainerTouched(MotionEvent e) {
         if (e.getAction() == MotionEvent.ACTION_UP)
-            if (floatingToolbar.getVisibility() == View.VISIBLE)
-                floatingToolbar.hide();
-            else
-                floatingToolbar.show(new Point((int) e.getRawX(), (int) e.getRawY()));
+            floatingToolbar.show(new Point((int) e.getX() + mainContainer.getPaddingLeft(), (int) e.getY() + mainContainer.getPaddingTop()));
+    }
+
+    private class TestAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return 8;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final ActionView view = ActionView_.build(DemoActivity.this);
+            view.bind(String.valueOf(position), "Action " + position);
+            return view;
+        }
     }
 }

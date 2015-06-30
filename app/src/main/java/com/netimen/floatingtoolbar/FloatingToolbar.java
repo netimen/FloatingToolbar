@@ -18,13 +18,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class FloatingToolbar<T> extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
-    private int previousContainerWidth;
+    private int currentContainerWidth;
     private Listener<T> listener;
 
     @LayoutRes
@@ -44,9 +45,9 @@ public class FloatingToolbar<T> extends FrameLayout {
             @Override
             public void onGlobalLayout() {
                 final int containerWidth = ((View) getParent()).getWidth() - ((View) getParent()).getPaddingLeft() - ((View) getParent()).getPaddingRight(); // CUR paddings/margins
-                Log.d(LOG_TAG, "onGlobalLayout: pW: " + previousContainerWidth + " w: " + containerWidth);
-                if (previousContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
-                    previousContainerWidth = containerWidth;
+                Log.d(LOG_TAG, "onGlobalLayout: pW: " + currentContainerWidth + " w: " + containerWidth);
+                if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
+                    currentContainerWidth = containerWidth;
                     for (int i = 0; i < getChildCount(); i++)
                         ((Panel) getChildAt(i)).relayout(containerWidth);
                 }
@@ -63,13 +64,20 @@ public class FloatingToolbar<T> extends FrameLayout {
         return listener;
     }
 
+    public void addPanel(Adapter adapter) {
+        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
+
     public void addPanel(T[] actions) {
-        addView(new Panel<>(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions)), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addPanel(new SimpleAdapter(getContext(), android.R.layout.simple_list_item_1, actions));
     }
 
     public void show(Point position) {
+        if (getMeasuredWidth() == 0)
+            measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+
         final MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
-        layoutParams.leftMargin = position.x;
+        layoutParams.leftMargin = Math.min(position.x, currentContainerWidth - getMeasuredWidth()); // fitting to screen by x axis
         layoutParams.topMargin = position.y;
         setLayoutParams(layoutParams);
         changeVisibility(true);
@@ -83,18 +91,22 @@ public class FloatingToolbar<T> extends FrameLayout {
         setVisibility(visible ? VISIBLE : GONE);
     }
 
-    public class Adapter extends ArrayAdapter<T> {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
+    }
 
-        public Adapter(Context context, int resource, T[] actions) {
+    public class SimpleAdapter extends ArrayAdapter<T> {
+
+        public SimpleAdapter(Context context, int resource, T[] actions) {
             super(context, resource);
-//            for (int action : actions) add(action); // can't use addAll on primitive array
             addAll(actions);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             final View view = super.getView(position, convertView, parent);
-            ((TextView) view).setText("Toolbar action " + position);
+            ((TextView) view).setText("action " + position);
             view.setBackgroundColor(Color.BLUE);
             ((TextView) view).setSingleLine();
             return view;
@@ -104,4 +116,4 @@ public class FloatingToolbar<T> extends FrameLayout {
     public interface Listener<T> {
         void actionSelected(T action);
     }
-}
+} // CUR height regulation

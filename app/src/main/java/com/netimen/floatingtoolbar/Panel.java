@@ -12,7 +12,7 @@ import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Adapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -22,10 +22,10 @@ import android.widget.LinearLayout;
  */
 public class Panel<T> extends FrameLayout {
     private int currentContainerId;
-    private final ArrayAdapter<T> adapter;
+    private final Adapter adapter;
     private int visibleActionPosition;
 
-    public Panel(Context context, ArrayAdapter<T> adapter) {
+    public Panel(Context context, Adapter adapter) {
         super(context);
         this.adapter = adapter;
         setBackgroundColor(Color.GRAY); // CUR
@@ -79,6 +79,11 @@ public class Panel<T> extends FrameLayout {
         showContainer(containerToShow);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
+    }
+
     private void addViewToContainer(View view) {
         getCurrentContainer().addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
@@ -127,8 +132,9 @@ public class Panel<T> extends FrameLayout {
         return view;
     }
 
+    @SuppressWarnings("unchecked")
     private T getViewAction(View v) {
-        return adapter.getItem(getViewPositionInAdapter(v));
+        return (T) adapter.getItem(getViewPositionInAdapter(v));
     }
 
     private int getViewPositionInAdapter(View v) {

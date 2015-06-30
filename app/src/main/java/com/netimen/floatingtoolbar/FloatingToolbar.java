@@ -11,6 +11,7 @@ package com.netimen.floatingtoolbar;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -26,6 +27,10 @@ public class FloatingToolbar<T> extends FrameLayout {
     private int previousContainerWidth;
     private Listener<T> listener;
 
+    @LayoutRes
+    int moreButtonLayout, backButtonLayout;
+
+
     public FloatingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -33,6 +38,8 @@ public class FloatingToolbar<T> extends FrameLayout {
     public FloatingToolbar(Context context) {
         super(context);
         setBackgroundColor(Color.RED);
+        moreButtonLayout = R.layout.more_button;
+        backButtonLayout = R.layout.back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -57,14 +64,23 @@ public class FloatingToolbar<T> extends FrameLayout {
     }
 
     public void addPanel(T[] actions) {
-        addView(new Panel<>(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions), R.layout.more_button, R.layout.back_button), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addView(new Panel<>(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions)), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
-    public void show(Point position) { // CUR
-        final FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) getLayoutParams();
+    public void show(Point position) {
+        final MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
         layoutParams.leftMargin = position.x;
         layoutParams.topMargin = position.y;
         setLayoutParams(layoutParams);
+        changeVisibility(true);
+    }
+
+    public void hide() {
+        changeVisibility(false);
+    }
+
+    private void changeVisibility(boolean visible) { // CUR animation
+        setVisibility(visible ? VISIBLE : GONE);
     }
 
     public class Adapter extends ArrayAdapter<T> {

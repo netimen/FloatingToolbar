@@ -21,18 +21,13 @@ import android.widget.LinearLayout;
  * CUR animation & stretching
  */
 public class Panel<T> extends FrameLayout {
-    @LayoutRes
-    private final int moreButtonLayout, backButtonLayout;
-
     private int currentContainerId;
     private final ArrayAdapter<T> adapter;
     private int visibleActionPosition;
 
-    public Panel(Context context, ArrayAdapter<T> adapter, @LayoutRes int moreButtonLayout, @LayoutRes int backButtonLayout) {
+    public Panel(Context context, ArrayAdapter<T> adapter) {
         super(context);
         this.adapter = adapter;
-        this.moreButtonLayout = moreButtonLayout;
-        this.backButtonLayout = backButtonLayout;
         setBackgroundColor(Color.GRAY); // CUR
     }
 
@@ -102,7 +97,7 @@ public class Panel<T> extends FrameLayout {
     /// more/back buttons
 
     private View createBackButton() { // CUR inline, make ClickListener a field
-        return createSpecialButton(backButtonLayout, new OnClickListener() {
+        return createSpecialButton(getToolbar().backButtonLayout, new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId - 1);
@@ -111,7 +106,7 @@ public class Panel<T> extends FrameLayout {
     }
 
     private View createMoreButton() {
-        return createSpecialButton(moreButtonLayout, new OnClickListener() {
+        return createSpecialButton(getToolbar().moreButtonLayout, new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId + 1);

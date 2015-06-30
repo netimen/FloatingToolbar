@@ -1,14 +1,16 @@
 package com.netimen.floatingtoolbar;
 
+import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
 
 
@@ -23,7 +25,7 @@ public class DemoActivity extends AppCompatActivity {
     @AfterViews
     void ready() {
         floatingToolbar = new FloatingToolbar<>(this);
-        floatingToolbar.addPanel(new Integer[] {1, 2, 3, 4, 5, 6});
+        floatingToolbar.addPanel(new Integer[]{1, 2, 3, 4, 5, 6});
         floatingToolbar.setListener(new FloatingToolbar.Listener<Integer>() {
             @Override
             public void actionSelected(Integer action) {
@@ -34,8 +36,12 @@ public class DemoActivity extends AppCompatActivity {
         floatingToolbar.setVisibility(View.GONE);
     }
 
-    @Click
-    void mainContainerClicked() {
-        floatingToolbar.setVisibility(floatingToolbar.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+    @Touch
+    void mainContainerTouched(MotionEvent e) {
+        if (e.getAction() == MotionEvent.ACTION_UP)
+            if (floatingToolbar.getVisibility() == View.VISIBLE)
+                floatingToolbar.hide();
+            else
+                floatingToolbar.show(new Point((int) e.getRawX(), (int) e.getRawY()));
     }
 }

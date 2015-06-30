@@ -11,6 +11,7 @@ package com.netimen.floatingtoolbar;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -20,9 +21,10 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class FloatingToolbar extends FrameLayout {
+public class FloatingToolbar<T> extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
     private int previousContainerWidth;
+    private Listener<T> listener;
 
     public FloatingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -34,7 +36,7 @@ public class FloatingToolbar extends FrameLayout {
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                final int containerWidth = ((View) getParent()).getWidth() - ((View) getParent()).getPaddingLeft() - ((View) getParent()).getPaddingRight();
+                final int containerWidth = ((View) getParent()).getWidth() - ((View) getParent()).getPaddingLeft() - ((View) getParent()).getPaddingRight(); // CUR paddings/margins
                 Log.d(LOG_TAG, "onGlobalLayout: pW: " + previousContainerWidth + " w: " + containerWidth);
                 if (previousContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     previousContainerWidth = containerWidth;
@@ -45,8 +47,17 @@ public class FloatingToolbar extends FrameLayout {
         });
     }
 
-    public void addPanel(int[] actions) {
-        addView(new Panel(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions), R.layout.more_button, R.layout.back_button), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    public void setListener(Listener<T> listener) {
+        this.listener = listener;
+    }
+
+    @Nullable
+    public Listener<T> getListener() {
+        return listener;
+    }
+
+    public void addPanel(T[] actions) {
+        addView(new Panel<>(getContext(), new Adapter(getContext(), android.R.layout.simple_list_item_1, actions), R.layout.more_button, R.layout.back_button), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     public void show(Point position) { // CUR
@@ -56,11 +67,12 @@ public class FloatingToolbar extends FrameLayout {
         setLayoutParams(layoutParams);
     }
 
-    public class Adapter extends ArrayAdapter<Integer> {
+    public class Adapter extends ArrayAdapter<T> {
 
-        public Adapter(Context context, int resource, int[] actions) {
+        public Adapter(Context context, int resource, T[] actions) {
             super(context, resource);
-            for (int action : actions) add(action); // can't use addAll on primitive array
+//            for (int action : actions) add(action); // can't use addAll on primitive array
+            addAll(actions);
         }
 
         @Override
@@ -71,5 +83,9 @@ public class FloatingToolbar extends FrameLayout {
             ((TextView) view).setSingleLine();
             return view;
         }
+    }
+
+    public interface Listener<T> {
+        void actionSelected(T action);
     }
 }

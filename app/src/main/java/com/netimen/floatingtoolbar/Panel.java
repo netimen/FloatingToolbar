@@ -20,14 +20,15 @@ import android.widget.LinearLayout;
  * Contains the action views and layouts them so they fit the maximum width and distributes them to several containers navigable via more/back buttons if needed
  * CUR animation & stretching
  */
-public class Panel extends FrameLayout {
-    private final ArrayAdapter<Integer> adapter;
+public class Panel<T> extends FrameLayout {
     @LayoutRes
     private final int moreButtonLayout, backButtonLayout;
 
     private int currentContainerId;
+    private final ArrayAdapter<T> adapter;
+    private int visibleActionPosition;
 
-    public Panel(Context context, ArrayAdapter<Integer> adapter, @LayoutRes int moreButtonLayout, @LayoutRes int backButtonLayout) {
+    public Panel(Context context, ArrayAdapter<T> adapter, @LayoutRes int moreButtonLayout, @LayoutRes int backButtonLayout) {
         super(context);
         this.adapter = adapter;
         this.moreButtonLayout = moreButtonLayout;
@@ -38,10 +39,17 @@ public class Panel extends FrameLayout {
     public void relayout(int containerWidth) {
         removeAllViews();
         currentContainerId = 0;
-        int currentContainerWidth = 0;
+        int currentContainerWidth = 0, containerToShow = 0;
         for (int itemId = 0; itemId < adapter.getCount(); itemId++) {
-            View actionView = adapter.getView(itemId, null, null);
-            actionView.measure(View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            View actionView = initView(adapter.getView(itemId, null, null), new OnClickListener() {
+                @Override
+                public void onClick(View v) { // CUR make a field
+                    final FloatingToolbar.Listener<T> listener = getToolbar().getListener();
+                    if (listener != null)
+                        listener.actionSelected(getViewAction(v));
+                }
+            });
+            actionView.setTag(itemId);
 
             if (currentContainerWidth + actionView.getMeasuredWidth() > containerWidth) {
                 final View moreButton = createMoreButton();
@@ -59,17 +67,21 @@ public class Panel extends FrameLayout {
                 container.setOrientation(LinearLayout.HORIZONTAL);
                 container.setVisibility(GONE);
                 addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
                 if (currentContainerId > 0) {
                     final View backButton = createBackButton();
                     addViewToContainer(backButton);
                     currentContainerWidth = backButton.getMeasuredWidth();
                 } else
                     currentContainerWidth = 0;
+
+                if (visibleActionPosition >= itemId)
+                    containerToShow = currentContainerId;
             }
             addViewToContainer(actionView);
             currentContainerWidth += actionView.getMeasuredWidth();
         }
-        showContainer(0);
+        showContainer(containerToShow);
     }
 
     private void addViewToContainer(View view) {
@@ -80,6 +92,7 @@ public class Panel extends FrameLayout {
         getCurrentContainer().setVisibility(GONE);
         currentContainerId = containerId;
         getCurrentContainer().setVisibility(VISIBLE);
+        visibleActionPosition = getViewPositionInAdapter(getFirstVisibleActionView());
     }
 
     ViewGroup getCurrentContainer() {
@@ -88,31 +101,52 @@ public class Panel extends FrameLayout {
 
     /// more/back buttons
 
-    private View createBackButton() {
-        final View view = createSpecialButton(backButtonLayout);
-        view.setOnClickListener(new OnClickListener() {
+    private View createBackButton() { // CUR inline, make ClickListener a field
+        return createSpecialButton(backButtonLayout, new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId - 1);
             }
         });
-        return view;
     }
 
     private View createMoreButton() {
-        final View view = createSpecialButton(moreButtonLayout);
-        view.setOnClickListener(new OnClickListener() {
+        return createSpecialButton(moreButtonLayout, new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId + 1);
             }
         });
+    }
+
+    private View createSpecialButton(@LayoutRes int layoutRes, OnClickListener onClickListener) {
+        return initView(inflate(getContext(), layoutRes, null), onClickListener);
+    }
+
+    /**
+     * measures and sets ClickListener
+     */
+    private View initView(View view, OnClickListener onClickListener) {
+        view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        view.setOnClickListener(onClickListener);
         return view;
     }
 
-    private View createSpecialButton(@LayoutRes int layoutRes) {
-        final View view = inflate(getContext(), layoutRes, null);
-        view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-        return view;
+    private T getViewAction(View v) {
+        return adapter.getItem(getViewPositionInAdapter(v));
     }
+
+    private int getViewPositionInAdapter(View v) {
+        return (int) v.getTag();
+    }
+
+    @SuppressWarnings("unchecked")
+    private FloatingToolbar<T> getToolbar() {
+        return (FloatingToolbar<T>) getParent();
+    }
+
+    private View getFirstVisibleActionView() {
+        return getCurrentContainer().getChildAt(currentContainerId == 0 ? 0 : 1); // avoiding 'back' button if needed
+    }
+
 }

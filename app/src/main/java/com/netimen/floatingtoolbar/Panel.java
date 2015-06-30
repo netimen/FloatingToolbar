@@ -10,6 +10,7 @@ package com.netimen.floatingtoolbar;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -85,7 +86,9 @@ public class Panel<T> extends FrameLayout {
     }
 
     private void addViewToContainer(View view) {
-        getCurrentContainer().addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.gravity = Gravity.CENTER_VERTICAL;
+        getCurrentContainer().addView(view, layoutParams);
     }
 
     private void showContainer(int containerId) {

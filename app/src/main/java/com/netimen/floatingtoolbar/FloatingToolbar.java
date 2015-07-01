@@ -30,6 +30,7 @@ public class FloatingToolbar<T> extends FrameLayout {
 
     @LayoutRes
     int moreButtonLayout, backButtonLayout;
+    private int animationDuration = 800;
 
 
     public FloatingToolbar(Context context, AttributeSet attrs) {
@@ -87,13 +88,42 @@ public class FloatingToolbar<T> extends FrameLayout {
         changeVisibility(false);
     }
 
-    private void changeVisibility(boolean visible) { // CUR animation
+    protected void changeVisibility(boolean visible) { // CUR animation
         setVisibility(visible ? VISIBLE : GONE);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
+    }
+
+
+    protected void changePanels(final View showing, final View hiding) { // CUR move to another class
+        changePanels(showing, hiding, true);
+    }
+
+    protected void changePanels(final View showing, final View hiding, boolean animate) { // CUR move to another class
+        if (animate) {
+
+            final int duration = animationDuration * 2 / 5;
+            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    hiding.setVisibility(INVISIBLE);
+                    showing.setVisibility(VISIBLE);
+                    showing.animate().alpha(1).setDuration(duration).setStartDelay(animationDuration - 2 * duration);
+                }
+            });
+//            Utils.animateWidthTo(selectionPopupBg, showing.getMeasuredWidth(), animationDuration);
+        } else {
+//            hiding.setVisibility(INVISIBLE);
+//            hiding.setAlpha(0);
+//            showing.setVisibility(VISIBLE);
+//            showing.setAlpha(1);
+//            final ViewGroup.LayoutParams layoutParams = selectionPopupBg.getLayoutParams();
+//            layoutParams.width = showing.getMeasuredWidth();
+//            selectionPopupBg.setLayoutParams(layoutParams);
+        }
     }
 
     public class SimpleAdapter extends ArrayAdapter<T> {

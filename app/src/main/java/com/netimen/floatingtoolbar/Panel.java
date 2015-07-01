@@ -7,6 +7,7 @@
  */
 package com.netimen.floatingtoolbar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
@@ -21,6 +22,7 @@ import android.widget.LinearLayout;
  * Contains the action views and layouts them so they fit the maximum width and distributes them to several containers navigable via more/back buttons if needed
  * CUR animation & stretching
  */
+@SuppressLint("ViewConstructor")
 public class Panel<T> extends FrameLayout {
     private int currentContainerId;
     private final Adapter adapter;
@@ -92,9 +94,10 @@ public class Panel<T> extends FrameLayout {
     }
 
     private void showContainer(int containerId) {
-        getCurrentContainer().setVisibility(GONE);
+//        getCurrentContainer().setVisibility(GONE);
+//        getCurrentContainer().setVisibility(VISIBLE);
+        getToolbar().changePanels(getChildAt(containerId), getChildAt(currentContainerId));
         currentContainerId = containerId;
-        getCurrentContainer().setVisibility(VISIBLE);
         visibleActionPosition = getViewPositionInAdapter(getFirstVisibleActionView());
     }
 
@@ -153,30 +156,4 @@ public class Panel<T> extends FrameLayout {
         return getCurrentContainer().getChildAt(currentContainerId == 0 ? 0 : 1); // avoiding 'back' button if needed
     }
 
-    ///
-
-    protected void showShare(final boolean show, boolean animate) {
-        final View hiding = show ? selectionActions : selectionShare, showing = show ? selectionShare : selectionActions;
-        if (animate) {
-
-            final int duration = animationDuration * 2 / 5;
-            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    hiding.setVisibility(INVISIBLE);
-                    showing.setVisibility(VISIBLE);
-                    showing.animate().alpha(1).setDuration(duration).setStartDelay(animationDuration - 2 * duration);
-                }
-            });
-            Utils.animateWidthTo(selectionPopupBg, showing.getMeasuredWidth(), animationDuration);
-        } else {
-            hiding.setVisibility(INVISIBLE);
-            hiding.setAlpha(0);
-            showing.setVisibility(VISIBLE);
-            showing.setAlpha(1);
-            final ViewGroup.LayoutParams layoutParams = selectionPopupBg.getLayoutParams();
-            layoutParams.width = showing.getMeasuredWidth();
-            selectionPopupBg.setLayoutParams(layoutParams);
-        }
-    }
 }

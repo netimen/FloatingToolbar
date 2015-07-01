@@ -10,7 +10,6 @@ package com.netimen.floatingtoolbar;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.LayoutRes;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import android.widget.LinearLayout;
 
 /**
  * Contains the action views and layouts them so they fit the maximum width and distributes them to several containers navigable via more/back buttons if needed
- * CUR animation & stretching
+ * CUR stretching
  */
 @SuppressLint("ViewConstructor")
 public class Panel<T> extends FrameLayout {
@@ -31,7 +30,8 @@ public class Panel<T> extends FrameLayout {
     public Panel(Context context, Adapter adapter) {
         super(context);
         this.adapter = adapter;
-        setBackgroundColor(Color.GRAY); // CUR
+        setBackgroundColor(Color.TRANSPARENT);
+//        setBackgroundColor(Color.BLUE);
     }
 
     public void relayout(int containerWidth) {
@@ -61,12 +61,10 @@ public class Panel<T> extends FrameLayout {
             }
 
             if (getCurrentContainer() == null) {
-                final LinearLayout container = new LinearLayout(getContext());
-                container.setOrientation(LinearLayout.HORIZONTAL);
-                container.setVisibility(GONE);
-                addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                final Container container = new Container(getContext(), currentContainerId);
+                addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
 
-                if (currentContainerId > 0) {
+                if (container.hasBackButton()) {
                     final View backButton = createBackButton();
                     addViewToContainer(backButton);
                     currentContainerWidth = backButton.getMeasuredWidth();
@@ -79,7 +77,18 @@ public class Panel<T> extends FrameLayout {
             addViewToContainer(actionView);
             currentContainerWidth += actionView.getMeasuredWidth();
         }
+
+        int maxHeight = 0;
+        for (int i = 0; i < getChildCount(); i++) {
+            final Container container = (Container) getChildAt(0);
+            container.adjustBackMoreButtonsHeight();
+            if (maxHeight < container.getMaxChildHeight())
+                maxHeight = container.getMaxChildHeight();
+        }
         showContainer(containerToShow);
+
+        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, maxHeight, Gravity.CENTER_VERTICAL));
+        measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY)); // so now getMeasuredHeight also returns maxHeight. Needed to adjust parent size
     }
 
     @Override
@@ -87,6 +96,9 @@ public class Panel<T> extends FrameLayout {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
     }
 
+    /**
+     * specifies view's height and sets gravity to CENTER_VERTICAL
+     */
     private void addViewToContainer(View view) {
         final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER_VERTICAL;
@@ -94,21 +106,19 @@ public class Panel<T> extends FrameLayout {
     }
 
     private void showContainer(int containerId) {
-//        getCurrentContainer().setVisibility(GONE);
-//        getCurrentContainer().setVisibility(VISIBLE);
         getToolbar().changePanels(getChildAt(containerId), getChildAt(currentContainerId));
         currentContainerId = containerId;
-        visibleActionPosition = getViewPositionInAdapter(getFirstVisibleActionView());
+        visibleActionPosition = getViewPositionInAdapter(getCurrentContainer().getFirstActionView());
     }
 
-    ViewGroup getCurrentContainer() {
-        return (currentContainerId == -1 || currentContainerId >= getChildCount()) ? null : (ViewGroup) getChildAt(currentContainerId);
+    private Container getCurrentContainer() {
+        return (currentContainerId == -1 || currentContainerId >= getChildCount()) ? null : (Container) getChildAt(currentContainerId);
     }
 
     /// more/back buttons
 
     private View createBackButton() { // CUR inline, make ClickListener a field
-        return createSpecialButton(getToolbar().backButtonLayout, new OnClickListener() {
+        return initView(inflate(getContext(), getToolbar().backButtonLayout, null), new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId - 1);
@@ -117,16 +127,12 @@ public class Panel<T> extends FrameLayout {
     }
 
     private View createMoreButton() {
-        return createSpecialButton(getToolbar().moreButtonLayout, new OnClickListener() {
+        return initView(inflate(getContext(), getToolbar().moreButtonLayout, null), new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showContainer(currentContainerId + 1);
             }
         });
-    }
-
-    private View createSpecialButton(@LayoutRes int layoutRes, OnClickListener onClickListener) {
-        return initView(inflate(getContext(), layoutRes, null), onClickListener);
     }
 
     /**
@@ -151,9 +157,4 @@ public class Panel<T> extends FrameLayout {
     private FloatingToolbar<T> getToolbar() {
         return (FloatingToolbar<T>) getParent();
     }
-
-    private View getFirstVisibleActionView() {
-        return getCurrentContainer().getChildAt(currentContainerId == 0 ? 0 : 1); // avoiding 'back' button if needed
-    }
-
 }

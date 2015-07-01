@@ -8,6 +8,7 @@
 package com.netimen.floatingtoolbar;
 
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -15,6 +16,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -31,6 +33,7 @@ public class FloatingToolbar<T> extends FrameLayout {
     @LayoutRes
     int moreButtonLayout, backButtonLayout;
     private int animationDuration = 800;
+    private View backgoundView;
 
 
     public FloatingToolbar(Context context, AttributeSet attrs) {
@@ -39,7 +42,11 @@ public class FloatingToolbar<T> extends FrameLayout {
 
     public FloatingToolbar(Context context) {
         super(context);
-        setBackgroundColor(Color.RED);
+        setBackgroundColor(Color.TRANSPARENT);
+        backgoundView = new View(context);
+        addView(backgoundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//        setBackgroundColor(Color.MAGENTA);
+        backgoundView.setBackgroundColor(Color.LTGRAY);
         moreButtonLayout = R.layout.more_button;
         backButtonLayout = R.layout.back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -49,8 +56,17 @@ public class FloatingToolbar<T> extends FrameLayout {
                 Log.d(LOG_TAG, "onGlobalLayout: pW: " + currentContainerWidth + " w: " + containerWidth);
                 if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     currentContainerWidth = containerWidth;
-                    for (int i = 0; i < getChildCount(); i++)
-                        ((Panel) getChildAt(i)).relayout(containerWidth);
+                    int maxHeight = 0;
+                    for (int i = 1; i < getChildCount(); i++) { // skipping background child
+                        final Panel panel = (Panel) getChildAt(i);
+                        panel.relayout(containerWidth);
+                        if (panel.getMeasuredHeight() > maxHeight)
+                            maxHeight = panel.getMeasuredHeight();
+                    }
+
+                    final ViewGroup.LayoutParams layoutParams = backgoundView.getLayoutParams();
+                    layoutParams.height = maxHeight;
+                    backgoundView.setLayoutParams(layoutParams);
                 }
             }
         });
@@ -66,7 +82,7 @@ public class FloatingToolbar<T> extends FrameLayout {
     }
 
     public void addPanel(Adapter adapter) {
-        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
     }
 
     public void addPanel(T[] actions) {
@@ -97,16 +113,14 @@ public class FloatingToolbar<T> extends FrameLayout {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
     }
 
-
     protected void changePanels(final View showing, final View hiding) { // CUR move to another class
         changePanels(showing, hiding, true);
     }
 
     protected void changePanels(final View showing, final View hiding, boolean animate) { // CUR move to another class
         if (animate) {
-
             final int duration = animationDuration * 2 / 5;
-            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
+            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() { // CUR make min API 16
                 @Override
                 public void run() {
                     hiding.setVisibility(INVISIBLE);
@@ -114,16 +128,30 @@ public class FloatingToolbar<T> extends FrameLayout {
                     showing.animate().alpha(1).setDuration(duration).setStartDelay(animationDuration - 2 * duration);
                 }
             });
-//            Utils.animateWidthTo(selectionPopupBg, showing.getMeasuredWidth(), animationDuration);
+            animateWidthTo(backgoundView, showing.getMeasuredWidth(), animationDuration);
         } else {
-//            hiding.setVisibility(INVISIBLE);
-//            hiding.setAlpha(0);
-//            showing.setVisibility(VISIBLE);
-//            showing.setAlpha(1);
-//            final ViewGroup.LayoutParams layoutParams = selectionPopupBg.getLayoutParams();
-//            layoutParams.width = showing.getMeasuredWidth();
-//            selectionPopupBg.setLayoutParams(layoutParams);
+            hiding.setVisibility(GONE);
+            hiding.setAlpha(0);
+            showing.setVisibility(VISIBLE);
+            showing.setAlpha(1);
+            final ViewGroup.LayoutParams layoutParams = backgoundView.getLayoutParams();
+            layoutParams.width = showing.getMeasuredWidth();
+            backgoundView.setLayoutParams(layoutParams);
         }
+    }
+
+    public static void animateWidthTo(final View view, int newWidth, int animationDuration) {
+        ValueAnimator anim = ValueAnimator.ofInt(view.getWidth(), newWidth).setDuration(animationDuration);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                layoutParams.width = val;
+                view.setLayoutParams(layoutParams);
+            }
+        });
+        anim.start();
     }
 
     public class SimpleAdapter extends ArrayAdapter<T> {

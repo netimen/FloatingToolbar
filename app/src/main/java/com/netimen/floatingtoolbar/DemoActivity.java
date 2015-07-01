@@ -64,6 +64,7 @@ public class DemoActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             final ActionView view = ActionView_.build(DemoActivity.this);
+//            view.setBackgroundColor(Color.RED);
             view.bind(String.valueOf(position), "Action " + position);
             return view;
         }

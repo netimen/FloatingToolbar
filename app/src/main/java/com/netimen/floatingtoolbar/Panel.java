@@ -153,4 +153,30 @@ public class Panel<T> extends FrameLayout {
         return getCurrentContainer().getChildAt(currentContainerId == 0 ? 0 : 1); // avoiding 'back' button if needed
     }
 
+    ///
+
+    protected void showShare(final boolean show, boolean animate) {
+        final View hiding = show ? selectionActions : selectionShare, showing = show ? selectionShare : selectionActions;
+        if (animate) {
+
+            final int duration = animationDuration * 2 / 5;
+            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    hiding.setVisibility(INVISIBLE);
+                    showing.setVisibility(VISIBLE);
+                    showing.animate().alpha(1).setDuration(duration).setStartDelay(animationDuration - 2 * duration);
+                }
+            });
+            Utils.animateWidthTo(selectionPopupBg, showing.getMeasuredWidth(), animationDuration);
+        } else {
+            hiding.setVisibility(INVISIBLE);
+            hiding.setAlpha(0);
+            showing.setVisibility(VISIBLE);
+            showing.setAlpha(1);
+            final ViewGroup.LayoutParams layoutParams = selectionPopupBg.getLayoutParams();
+            layoutParams.width = showing.getMeasuredWidth();
+            selectionPopupBg.setLayoutParams(layoutParams);
+        }
+    }
 }

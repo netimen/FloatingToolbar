@@ -62,7 +62,7 @@ public class Panel<T> extends FrameLayout {
 
             if (getCurrentContainer() == null) {
                 final Container container = new Container(getContext(), currentContainerId);
-                addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
+                addView(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 
                 if (container.hasBackButton()) {
                     final View backButton = createBackButton();
@@ -87,7 +87,7 @@ public class Panel<T> extends FrameLayout {
         }
         showContainer(containerToShow);
 
-        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, maxHeight, Gravity.CENTER_VERTICAL));
+        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, maxHeight, Gravity.CENTER));
         measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.EXACTLY)); // so now getMeasuredHeight also returns maxHeight. Needed to adjust parent size
     }
 
@@ -97,11 +97,11 @@ public class Panel<T> extends FrameLayout {
     }
 
     /**
-     * specifies view's height and sets gravity to CENTER_VERTICAL
+     * specifies view's height and sets gravity to CENTER
      */
     private void addViewToContainer(View view) {
         final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.gravity = Gravity.CENTER_VERTICAL;
+        layoutParams.gravity = Gravity.CENTER;
         getCurrentContainer().addView(view, layoutParams);
     }
 

@@ -44,7 +44,7 @@ public class FloatingToolbar<T> extends FrameLayout {
         super(context);
         setBackgroundColor(Color.TRANSPARENT);
         backgoundView = new View(context);
-        addView(backgoundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(backgoundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
 //        setBackgroundColor(Color.MAGENTA);
         backgoundView.setBackgroundColor(Color.LTGRAY);
         moreButtonLayout = R.layout.more_button;
@@ -82,7 +82,7 @@ public class FloatingToolbar<T> extends FrameLayout {
     }
 
     public void addPanel(Adapter adapter) {
-        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
+        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
 
     public void addPanel(T[] actions) {

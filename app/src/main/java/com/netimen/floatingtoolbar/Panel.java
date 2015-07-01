@@ -31,7 +31,6 @@ public class Panel<T> extends FrameLayout {
         super(context);
         this.adapter = adapter;
         setBackgroundColor(Color.TRANSPARENT);
-//        setBackgroundColor(Color.BLUE);
     }
 
     public void relayout(int containerWidth) {

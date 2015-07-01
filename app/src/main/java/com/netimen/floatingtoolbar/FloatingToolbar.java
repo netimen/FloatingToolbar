@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 public class FloatingToolbar<T> extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
+    private final FadeAnimator fadeAnimator;
     private int currentContainerWidth;
     private Listener<T> listener;
 
@@ -36,16 +37,16 @@ public class FloatingToolbar<T> extends FrameLayout {
     private View backgoundView;
 
 
-    public FloatingToolbar(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public FloatingToolbar(Context context) {
+        this(context, null);
     }
 
-    public FloatingToolbar(Context context) {
-        super(context);
+    public FloatingToolbar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        fadeAnimator = new FadeAnimator(animationDuration);
         setBackgroundColor(Color.TRANSPARENT);
         backgoundView = new View(context);
         addView(backgoundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-//        setBackgroundColor(Color.MAGENTA);
         backgoundView.setBackgroundColor(Color.LTGRAY);
         moreButtonLayout = R.layout.more_button;
         backButtonLayout = R.layout.back_button; // CUR builder, attr etc
@@ -105,7 +106,10 @@ public class FloatingToolbar<T> extends FrameLayout {
     }
 
     protected void changeVisibility(boolean visible) { // CUR animation
-        setVisibility(visible ? VISIBLE : GONE);
+        if (true)
+            fadeAnimator.animateVisibility(this, visible, true);
+        else
+            setVisibility(visible ? VISIBLE : GONE);
     }
 
     @Override
@@ -120,7 +124,7 @@ public class FloatingToolbar<T> extends FrameLayout {
     protected void changePanels(final View showing, final View hiding, boolean animate) { // CUR move to another class
         if (animate) {
             final int duration = animationDuration * 2 / 5;
-            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() { // CUR make min API 16
+            hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     hiding.setVisibility(INVISIBLE);
@@ -174,4 +178,4 @@ public class FloatingToolbar<T> extends FrameLayout {
     public interface Listener<T> {
         void actionSelected(T action);
     }
-} // CUR height regulation
+}

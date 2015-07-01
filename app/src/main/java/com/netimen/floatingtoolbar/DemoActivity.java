@@ -41,7 +41,10 @@ public class DemoActivity extends AppCompatActivity {
     @Touch
     void mainContainerTouched(MotionEvent e) {
         if (e.getAction() == MotionEvent.ACTION_UP)
-            floatingToolbar.show(new Point((int) e.getX() + mainContainer.getPaddingLeft(), (int) e.getY() + mainContainer.getPaddingTop()));
+            if (floatingToolbar.getVisibility() == View.VISIBLE)
+                floatingToolbar.hide();
+            else
+                floatingToolbar.show(new Point((int) e.getX() + mainContainer.getPaddingLeft(), (int) e.getY() + mainContainer.getPaddingTop()));
     }
 
     private class TestAdapter extends BaseAdapter {

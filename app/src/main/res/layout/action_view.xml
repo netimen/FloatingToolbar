@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ToolbarElement"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
-    style="@style/ToolbarElement"
     android:orientation="vertical">
 
-    <TextView
+    <com.netimen.floatingtoolbar.CustomFontView
         android:id="@+id/icon"
         style="@style/TextIcon"
         android:layout_width="wrap_content"
@@ -19,5 +19,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
+        android:textColor="@android:color/white"
         tools:text="Action" />
 </LinearLayout>

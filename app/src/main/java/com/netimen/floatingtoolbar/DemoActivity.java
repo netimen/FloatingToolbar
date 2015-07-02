@@ -18,23 +18,26 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_demo)
 public class DemoActivity extends AppCompatActivity {
 
+    public enum Action {
+        QUOTE, NOTE, SHARE_FACEBOOK, SHARE_TWITTER, SHARE_VKONTAKTE, SHARE_INSTAGRAM, COPY, TRANSLATE, PROBLEM, DELETE, COLOR_1, COLOR_2, COLOR_3, COLOR_4
+    }
+
     @ViewById
     FrameLayout mainContainer;
 
-    private FloatingToolbar<Integer> floatingToolbar;
+    @ViewById
+    FloatingToolbar<Action> floatingToolbar;
 
     @AfterViews
     void ready() {
         mainContainer.setClipChildren(false);
-        floatingToolbar = new FloatingToolbar<>(this);
         floatingToolbar.addPanel(new TestAdapter());
-        floatingToolbar.setListener(new FloatingToolbar.Listener<Integer>() {
+        floatingToolbar.setListener(new FloatingToolbar.Listener<Action>() {
             @Override
-            public void actionSelected(Integer action) {
+            public void actionSelected(Action action) {
                 Toast.makeText(DemoActivity.this, "aaaa " + action, Toast.LENGTH_LONG).show();
             }
         });
-        mainContainer.addView(floatingToolbar, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         floatingToolbar.setVisibility(View.GONE);
     }
 
@@ -49,14 +52,17 @@ public class DemoActivity extends AppCompatActivity {
 
     private class TestAdapter extends BaseAdapter {
 
+        CharSequence[] characters = {"", "", "r", "h", "c", "!"};
+
         @Override
         public int getCount() {
-            return 8;
+//            return Action.values().length;
+            return characters.length;
         }
 
         @Override
         public Object getItem(int position) {
-            return position;
+            return Action.values()[position];
         }
 
         @Override
@@ -65,11 +71,12 @@ public class DemoActivity extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) { // rhc!…bt
+
             final ActionView view = ActionView_.build(DemoActivity.this);
-//            view.setBackgroundColor(Color.RED);
-            view.bind(String.valueOf(position), "Action " + position);
+            view.bind(characters[position], "Action " + position);
             return view;
         }
     }
+
 }

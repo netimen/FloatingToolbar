@@ -2,7 +2,10 @@
     <string name="app_name">FloatingToolbar Demo</string>
 
     <string name="action_settings">Settings</string>
-    <string name="tap_anywhere">Tap anywhere on the screen to see the toolbar</string>
-    <string name="more">--</string>
-    <string name="back">←</string>
+    <string name="tap_anywhere">Tap anywehre on the screen to see toolbar</string>
+    <string name="lorem_ipsum">And here we have big text:Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut at velit sed ipsum venenatis dapibus. Duis nulla elit, bibendum consequat felis vel, aliquam fringilla lorem. Praesent quis blandit justo, ut ultricies enim. Vestibulum ac diam eget dolor dignissim ultrices. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Integer scelerisque lobortis elit. Nunc pulvinar ligula nec mi gravida, accumsan blandit libero sollicitudin. Praesent vitae nunc eros. Aenean placerat felis vitae mi sollicitudin cursus. Vestibulum a convallis enim. Pellentesque porttitor sem vehicula quam mollis pharetra. Praesent a luctus augue. In ultrices erat ac turpis varius, et hendrerit metus consectetur. Duis interdum ligula ipsum, non molestie erat sodales ornare.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget sem vitae nulla interdum convallis in et justo. Aenean placerat pulvinar sapien, id eleifend nunc auctor sed. Nunc sit amet molestie eros, a porta ipsum. Aliquam gravida sed mi ut lobortis. Proin at odio libero. Etiam finibus ipsum sit amet eros dictum, non blandit odio semper. Donec a mi bibendum, posuere sapien et, posuere tortor. Sed tempor massa orci, eget gravida elit ultricies ut. Nullam urna risus, commodo sit amet aliquet eu, lacinia quis velit.</string>
+    <string name="more">…</string>
+    <string name="back">b</string>
 </resources>

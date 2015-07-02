@@ -44,10 +44,9 @@ public class FloatingToolbar<T> extends FrameLayout {
     public FloatingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
         fadeAnimator = new FadeAnimator(animationDuration);
-        setBackgroundColor(Color.TRANSPARENT);
-        backgroundView = new View(context);
-        addView(backgroundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-        backgroundView.setBackgroundColor(Color.LTGRAY);
+
+        initBackground(context);
+
         moreButtonLayout = R.layout.more_button;
         backButtonLayout = R.layout.back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -71,6 +70,17 @@ public class FloatingToolbar<T> extends FrameLayout {
                 }
             }
         });
+    }
+
+    /**
+     * we need to store background in a different view, so we can animate it easily
+     */
+    private void initBackground(Context context) {
+        backgroundView = new View(context);
+        backgroundView.setBackground(getBackground());
+        setBackground(null); // without this they share common drawable with Toolbar
+        setBackgroundColor(Color.TRANSPARENT);
+        addView(backgroundView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
 
     public void setListener(Listener<T> listener) {

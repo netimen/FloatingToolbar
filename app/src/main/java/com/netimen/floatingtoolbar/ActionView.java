@@ -23,7 +23,7 @@ public class ActionView extends LinearLayout {
         super(context);
     }
 
-    public void bind(String icon, String caption) {
+    public void bind(CharSequence icon, String caption) {
         this.icon.setText(icon);
         this.caption.setText(caption);
     }

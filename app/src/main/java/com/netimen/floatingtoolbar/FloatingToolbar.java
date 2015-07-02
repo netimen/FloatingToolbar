@@ -33,8 +33,8 @@ public class FloatingToolbar<T> extends FrameLayout {
 
     @LayoutRes
     int moreButtonLayout, backButtonLayout;
-    private int animationDuration = 800;
-    private View backgoundView;
+    private int animationDuration = 300;
+    private View backgroundView;
 
 
     public FloatingToolbar(Context context) {
@@ -45,9 +45,9 @@ public class FloatingToolbar<T> extends FrameLayout {
         super(context, attrs);
         fadeAnimator = new FadeAnimator(animationDuration);
         setBackgroundColor(Color.TRANSPARENT);
-        backgoundView = new View(context);
-        addView(backgoundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-        backgoundView.setBackgroundColor(Color.LTGRAY);
+        backgroundView = new View(context);
+        addView(backgroundView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        backgroundView.setBackgroundColor(Color.LTGRAY);
         moreButtonLayout = R.layout.more_button;
         backButtonLayout = R.layout.back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -65,9 +65,9 @@ public class FloatingToolbar<T> extends FrameLayout {
                             maxHeight = panel.getMeasuredHeight();
                     }
 
-                    final ViewGroup.LayoutParams layoutParams = backgoundView.getLayoutParams();
+                    final ViewGroup.LayoutParams layoutParams = backgroundView.getLayoutParams();
                     layoutParams.height = maxHeight;
-                    backgoundView.setLayoutParams(layoutParams);
+                    backgroundView.setLayoutParams(layoutParams);
                 }
             }
         });
@@ -132,15 +132,15 @@ public class FloatingToolbar<T> extends FrameLayout {
                     showing.animate().alpha(1).setDuration(duration).setStartDelay(animationDuration - 2 * duration);
                 }
             });
-            animateWidthTo(backgoundView, showing.getMeasuredWidth(), animationDuration);
+            animateWidthTo(backgroundView, showing.getMeasuredWidth(), animationDuration);
         } else {
             hiding.setVisibility(GONE);
             hiding.setAlpha(0);
             showing.setVisibility(VISIBLE);
             showing.setAlpha(1);
-            final ViewGroup.LayoutParams layoutParams = backgoundView.getLayoutParams();
+            final ViewGroup.LayoutParams layoutParams = backgroundView.getLayoutParams();
             layoutParams.width = showing.getMeasuredWidth();
-            backgoundView.setLayoutParams(layoutParams);
+            backgroundView.setLayoutParams(layoutParams);
         }
     }
 

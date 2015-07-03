@@ -98,7 +98,13 @@ public class Panel extends FrameLayout { // CUR remove param
     }
 
     private void showContainer(int containerId) {
-        getToolbar().changePanels(getChildAt(containerId), getChildAt(currentContainerId));
+        final View showing = getChildAt(containerId), hiding = getChildAt(currentContainerId);
+        if (getVisibility() == VISIBLE) {
+            getToolbar().changePanels(showing, hiding); // animate, adjust background etc
+        } else {
+            hiding.setVisibility(INVISIBLE);
+            showing.setVisibility(VISIBLE);
+        }
         currentContainerId = containerId;
         visibleActionPosition = getViewPositionInAdapter(getCurrentContainer().getFirstActionView());
     }

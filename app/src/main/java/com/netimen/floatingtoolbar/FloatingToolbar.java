@@ -130,7 +130,7 @@ public class FloatingToolbar extends FrameLayout {
     }
 
     protected void changePanels(final View showing, final View hiding, boolean animate) { // CUR move to another class
-        if (animate) {
+        if (animate && hiding.getVisibility() == VISIBLE) { // no need to animate if nothing is visible, so checking
             final int duration = animationDuration * 2 / 5;
             hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
                 @Override

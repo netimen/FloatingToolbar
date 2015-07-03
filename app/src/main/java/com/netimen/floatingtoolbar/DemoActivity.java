@@ -107,15 +107,14 @@ public class DemoActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final ActionView view = ActionView_.build(toolbar.getContext());
             final Button button = (Button) getItem(position);
-            view.bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
+            final View view = buildView(button);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     switch (button) {
                         case CHOOSE_COLOR:
-                            toolbar.showPanel(1);
+                            toolbar.showPanel(1); // CUR refactor
                             break;
                         default:
                             Toast.makeText(toolbar.getContext(), button.selectionAction.toString(), Toast.LENGTH_LONG).show();
@@ -124,6 +123,18 @@ public class DemoActivity extends AppCompatActivity {
                 }
             });
             return view;
+        }
+
+        private View buildView(Button button) {
+            View view;
+            switch (button.type) {
+                case ICON:
+                    view = new SelectionColorButton(toolbar.getContext(), 0.5f, 0.8f, 0.1f); // CUR size
+                    return view;
+                default:
+                    view = ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
+                    return view;
+            }
         }
     }
 

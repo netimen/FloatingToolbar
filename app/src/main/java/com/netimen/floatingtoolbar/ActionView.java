@@ -8,6 +8,7 @@
 package com.netimen.floatingtoolbar;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,8 +24,9 @@ public class ActionView extends LinearLayout {
         super(context);
     }
 
-    public void bind(CharSequence icon, String caption) {
+    public View bind(CharSequence icon, String caption) {
         this.icon.setText(icon);
         this.caption.setText(caption);
+        return this;
     }
 }

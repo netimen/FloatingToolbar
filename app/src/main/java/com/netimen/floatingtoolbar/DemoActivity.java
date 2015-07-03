@@ -41,7 +41,7 @@ public class DemoActivity extends AppCompatActivity {
     void mainContainerTouched(MotionEvent e) {
         if (e.getAction() == MotionEvent.ACTION_UP)
             if (floatingToolbar.getVisibility() == View.VISIBLE)
-                floatingToolbar.hide();
+                floatingToolbar.hide(false);
             else
                 floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft(), (int) e.getY() - mainContainer.getPaddingTop()));
     }
@@ -119,6 +119,7 @@ public class DemoActivity extends AppCompatActivity {
                             break;
                         default:
                             Toast.makeText(toolbar.getContext(), button.selectionAction.toString(), Toast.LENGTH_LONG).show();
+                            toolbar.hide(false);
                     }
                 }
             });

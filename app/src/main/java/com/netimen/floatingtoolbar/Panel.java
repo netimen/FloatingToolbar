@@ -97,7 +97,7 @@ public class Panel extends FrameLayout { // CUR remove param
         getCurrentContainer().addView(view, layoutParams);
     }
 
-    private void showContainer(int containerId) {
+    void showContainer(int containerId) {
         final View showing = getChildAt(containerId), hiding = getChildAt(currentContainerId);
         if (getVisibility() == VISIBLE) {
             getToolbar().changePanels(showing, hiding); // animate, adjust background etc

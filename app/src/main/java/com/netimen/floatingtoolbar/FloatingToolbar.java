@@ -33,6 +33,10 @@ public class FloatingToolbar extends FrameLayout {
     private int animationDuration = 300;
     private View backgroundView;
     private int currentPanelId;
+    /**
+     * show panel 0, don't remember last showing panel
+     */
+    private boolean resetStateBeforeShow;
 
 
     public FloatingToolbar(Context context) {
@@ -55,7 +59,7 @@ public class FloatingToolbar extends FrameLayout {
                 if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     currentContainerWidth = containerWidth;
                     int maxHeight = 0;
-                    for (int i = 0; i < getChildCount() - TECHNICAL_CHILDREN_COUNT; i++) { // skipping background child
+                    for (int i = 0; i < getPanelCount(); i++) { // skipping background child
                         final Panel panel = getPanel(i);
                         panel.relayout(containerWidth);
                         if (panel.getMeasuredHeight() > maxHeight)
@@ -68,6 +72,10 @@ public class FloatingToolbar extends FrameLayout {
                 }
             }
         });
+    }
+
+    private int getPanelCount() {
+        return getChildCount() - TECHNICAL_CHILDREN_COUNT;
     }
 
     /**
@@ -83,21 +91,34 @@ public class FloatingToolbar extends FrameLayout {
 
     public int addPanel(Adapter adapter) {
         final Panel panel = new Panel(getContext(), adapter);
-        if (getChildCount() > TECHNICAL_CHILDREN_COUNT) // initially only first panel is visible
+        if (getPanelCount() > 0) // initially only first panel is visible
             panel.setVisibility(INVISIBLE);
         addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        return getChildCount() - TECHNICAL_CHILDREN_COUNT - 1; // index of this panel
+        return getPanelCount() - 1; // index of this panel
     }
 
     public void show(Point position) {
         if (getMeasuredWidth() == 0)
             measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 
+        resetStateIfNeeded();
+
         final MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
         layoutParams.leftMargin = Math.min(position.x, currentContainerWidth - getMeasuredWidth()); // fitting to screen by x axis
         layoutParams.topMargin = position.y;
         setLayoutParams(layoutParams);
         changeVisibility(true);
+    }
+
+    /**
+     * displays panel 0, and scrolls all the panels to beginning
+     */
+    private void resetStateIfNeeded() {
+        if (resetStateBeforeShow) {
+            showPanel(0);
+            for (int i = 0; i < getPanelCount(); i++)
+                getPanel(i).showContainer(0);
+        }
     }
 
     public void showPanel(int panelId) {
@@ -109,8 +130,12 @@ public class FloatingToolbar extends FrameLayout {
         return (Panel) getChildAt(panelId + TECHNICAL_CHILDREN_COUNT);
     }
 
-    public void hide() {
+    /**
+     * @param rememberPosition if true, after calling again to {@link #show}, toolbar will display again current panel in current position
+     */
+    public void hide(boolean rememberPosition) {
         changeVisibility(false);
+        resetStateBeforeShow = !rememberPosition;
     }
 
     protected void changeVisibility(boolean visible) { // CUR animation
@@ -130,7 +155,7 @@ public class FloatingToolbar extends FrameLayout {
     }
 
     protected void changePanels(final View showing, final View hiding, boolean animate) { // CUR move to another class
-        if (animate && hiding.getVisibility() == VISIBLE) { // no need to animate if nothing is visible, so checking
+        if (animate && hiding.getVisibility() == VISIBLE && getVisibility() == VISIBLE) { // no need to animate if nothing is visible, so checking
             final int duration = animationDuration * 2 / 5;
             hiding.animate().alpha(0).setDuration(duration).withEndAction(new Runnable() {
                 @Override

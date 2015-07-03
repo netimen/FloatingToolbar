@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 public class FloatingToolbar<T> extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
+    public static final int TECHNICAL_CHILDREN_COUNT = 1;
     private final FadeAnimator fadeAnimator;
     private int currentContainerWidth;
     private Listener<T> listener;
@@ -35,6 +36,7 @@ public class FloatingToolbar<T> extends FrameLayout {
     int moreButtonLayout, backButtonLayout;
     private int animationDuration = 300;
     private View backgroundView;
+    private int currentPanelId;
 
 
     public FloatingToolbar(Context context) {
@@ -57,8 +59,8 @@ public class FloatingToolbar<T> extends FrameLayout {
                 if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     currentContainerWidth = containerWidth;
                     int maxHeight = 0;
-                    for (int i = 1; i < getChildCount(); i++) { // skipping background child
-                        final Panel panel = (Panel) getChildAt(i);
+                    for (int i = 0; i < getChildCount() - TECHNICAL_CHILDREN_COUNT; i++) { // skipping background child
+                        final Panel panel = getPanel(i);
                         panel.relayout(containerWidth);
                         if (panel.getMeasuredHeight() > maxHeight)
                             maxHeight = panel.getMeasuredHeight();
@@ -93,7 +95,10 @@ public class FloatingToolbar<T> extends FrameLayout {
     }
 
     public void addPanel(Adapter adapter) {
-        addView(new Panel<>(getContext(), adapter), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        final Panel<Object> panel = new Panel<>(getContext(), adapter);
+        if (getChildCount() > TECHNICAL_CHILDREN_COUNT) // initially only first panel is visible
+            panel.setVisibility(INVISIBLE);
+        addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
 
     public void addPanel(T[] actions) {
@@ -109,6 +114,16 @@ public class FloatingToolbar<T> extends FrameLayout {
         layoutParams.topMargin = position.y;
         setLayoutParams(layoutParams);
         changeVisibility(true);
+    }
+
+    public void showPanel(int panelId) {
+        changePanels(getPanel(panelId), getPanel(currentPanelId));
+        currentPanelId = panelId;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Panel getPanel(int panelId) {
+        return (Panel<T>) getChildAt(panelId + TECHNICAL_CHILDREN_COUNT);
     }
 
     public void hide() {
@@ -144,7 +159,7 @@ public class FloatingToolbar<T> extends FrameLayout {
             });
             animateWidthTo(backgroundView, showing.getMeasuredWidth(), animationDuration);
         } else {
-            hiding.setVisibility(GONE);
+            hiding.setVisibility(INVISIBLE);
             hiding.setAlpha(0);
             showing.setVisibility(VISIBLE);
             showing.setAlpha(1);

@@ -22,7 +22,7 @@ import android.widget.LinearLayout;
  * CUR stretching
  */
 @SuppressLint("ViewConstructor")
-public class Panel<T> extends FrameLayout {
+public class Panel extends FrameLayout { // CUR remove param
     private int currentContainerId;
     private final Adapter adapter;
     private int visibleActionPosition;
@@ -38,15 +38,8 @@ public class Panel<T> extends FrameLayout {
         currentContainerId = 0;
         int currentContainerWidth = 0, containerToShow = 0;
         for (int itemId = 0; itemId < adapter.getCount(); itemId++) {
-            View actionView = initView(adapter.getView(itemId, null, null), new OnClickListener() {
-                @Override
-                public void onClick(View v) { // CUR make a field
-                    final FloatingToolbar.Listener<T> listener = getToolbar().getListener();
-                    if (listener != null)
-                        listener.actionSelected(getViewAction(v));
-                }
-            });
-            actionView.setTag(itemId);
+            View actionView = initView(adapter.getView(itemId, null, null), null);
+            actionView.setTag(itemId); // needed to easily get view position in adapter later
 
             if (currentContainerWidth + actionView.getMeasuredWidth() > containerWidth) {
                 final View moreButton = createMoreButton();
@@ -139,21 +132,16 @@ public class Panel<T> extends FrameLayout {
      */
     private View initView(View view, OnClickListener onClickListener) {
         view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-        view.setOnClickListener(onClickListener);
+        if (onClickListener != null) // CUR refactor
+            view.setOnClickListener(onClickListener);
         return view;
-    }
-
-    @SuppressWarnings("unchecked")
-    private T getViewAction(View v) {
-        return (T) adapter.getItem(getViewPositionInAdapter(v));
     }
 
     private int getViewPositionInAdapter(View v) {
         return (int) v.getTag();
     }
 
-    @SuppressWarnings("unchecked")
-    private FloatingToolbar<T> getToolbar() {
-        return (FloatingToolbar<T>) getParent();
+    private FloatingToolbar getToolbar() {
+        return (FloatingToolbar) getParent();
     }
 }

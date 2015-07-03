@@ -8,4 +8,11 @@
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget sem vitae nulla interdum convallis in et justo. Aenean placerat pulvinar sapien, id eleifend nunc auctor sed. Nunc sit amet molestie eros, a porta ipsum. Aliquam gravida sed mi ut lobortis. Proin at odio libero. Etiam finibus ipsum sit amet eros dictum, non blandit odio semper. Donec a mi bibendum, posuere sapien et, posuere tortor. Sed tempor massa orci, eget gravida elit ultricies ut. Nullam urna risus, commodo sit amet aliquet eu, lacinia quis velit.</string>
     <string name="more">…</string>
     <string name="back">b</string>
+    <string name="quote">quote</string>
+    <string name="translate">translate</string>
+    <string name="note">note</string>
+    <string name="share">share</string>
+    <string name="copy">copy</string>
+    <string name="problem">problem</string>
+    <string name="delete">delete</string>
 </resources>

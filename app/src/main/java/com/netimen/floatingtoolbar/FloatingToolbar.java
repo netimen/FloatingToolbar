@@ -13,7 +13,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,16 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
-public class FloatingToolbar<T> extends FrameLayout {
+public class FloatingToolbar extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
     public static final int TECHNICAL_CHILDREN_COUNT = 1;
     private final FadeAnimator fadeAnimator;
     private int currentContainerWidth;
-    private Listener<T> listener;
 
     @LayoutRes
     int moreButtonLayout, backButtonLayout;
@@ -85,24 +81,12 @@ public class FloatingToolbar<T> extends FrameLayout {
         addView(backgroundView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
 
-    public void setListener(Listener<T> listener) {
-        this.listener = listener;
-    }
-
-    @Nullable
-    public Listener<T> getListener() {
-        return listener;
-    }
-
-    public void addPanel(Adapter adapter) {
-        final Panel<Object> panel = new Panel<>(getContext(), adapter);
+    public int addPanel(Adapter adapter) {
+        final Panel panel = new Panel(getContext(), adapter);
         if (getChildCount() > TECHNICAL_CHILDREN_COUNT) // initially only first panel is visible
             panel.setVisibility(INVISIBLE);
         addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-    }
-
-    public void addPanel(T[] actions) {
-        addPanel(new SimpleAdapter(getContext(), android.R.layout.simple_list_item_1, actions));
+        return getChildCount() - TECHNICAL_CHILDREN_COUNT - 1; // index of this panel
     }
 
     public void show(Point position) {
@@ -121,9 +105,8 @@ public class FloatingToolbar<T> extends FrameLayout {
         currentPanelId = panelId;
     }
 
-    @SuppressWarnings("unchecked")
     private Panel getPanel(int panelId) {
-        return (Panel<T>) getChildAt(panelId + TECHNICAL_CHILDREN_COUNT);
+        return (Panel) getChildAt(panelId + TECHNICAL_CHILDREN_COUNT);
     }
 
     public void hide() {
@@ -183,24 +166,21 @@ public class FloatingToolbar<T> extends FrameLayout {
         anim.start();
     }
 
-    public class SimpleAdapter extends ArrayAdapter<T> {
+//    public class SimpleAdapter extends ArrayAdapter<T> {
+//
+//        public SimpleAdapter(Context context, int resource, T[] actions) {
+//            super(context, resource);
+//            addAll(actions);
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            final View view = super.getView(position, convertView, parent);
+//            ((TextView) view).setText("action " + position);
+//            view.setBackgroundColor(Color.BLUE);
+//            ((TextView) view).setSingleLine();
+//            return view;
+//        }
+//    }
 
-        public SimpleAdapter(Context context, int resource, T[] actions) {
-            super(context, resource);
-            addAll(actions);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final View view = super.getView(position, convertView, parent);
-            ((TextView) view).setText("action " + position);
-            view.setBackgroundColor(Color.BLUE);
-            ((TextView) view).setSingleLine();
-            return view;
-        }
-    }
-
-    public interface Listener<T> {
-        void actionSelected(T action);
-    }
 }

@@ -34,7 +34,7 @@ public class DemoActivity extends AppCompatActivity {
     void ready() {
         mainContainer.setClipChildren(false);
         floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, new ActionAdapter.Button[]{ActionAdapter.Button.CHOOSE_COLOR, ActionAdapter.Button.NOTE, ActionAdapter.Button.TRANSLATE, ActionAdapter.Button.SHARE, ActionAdapter.Button.COPY, ActionAdapter.Button.PROBLEM, ActionAdapter.Button.DELETE}));
-        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, new ActionAdapter.Button[]{ActionAdapter.Button.COLOR_1, ActionAdapter.Button.COLOR_2}));
+        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, new ActionAdapter.Button[]{ActionAdapter.Button.COLOR_1, ActionAdapter.Button.COLOR_2, ActionAdapter.Button.COLOR_3, ActionAdapter.Button.COLOR_4}));
         floatingToolbar.setVisibility(View.GONE);
     }
 
@@ -63,7 +63,9 @@ public class DemoActivity extends AppCompatActivity {
             DELETE(ButtonType.TEXT_ICON, "t", R.string.delete, SelectionAction.DELETE),
             CHOOSE_COLOR(ButtonType.CHOOSE_COLOR_ICON, "", R.string.quote, SelectionAction.QUOTE),
             COLOR_1(ButtonType.ICON, SelectionAction.QUOTE),
-            COLOR_2(ButtonType.ICON, SelectionAction.QUOTE);
+            COLOR_2(ButtonType.ICON, SelectionAction.QUOTE),
+            COLOR_3(ButtonType.ICON, SelectionAction.QUOTE),
+            COLOR_4(ButtonType.ICON, SelectionAction.QUOTE);
 
 
             private final ButtonType type;
@@ -130,7 +132,23 @@ public class DemoActivity extends AppCompatActivity {
             View view;
             switch (button.type) {
                 case ICON:
-                    view = new SelectionColorButton(toolbar.getContext(), 0.5f, 0.8f, 0.1f, button == Button.COLOR_1 ? Color.argb(100, 255, 0, 0) : Color.argb(100, 0, 255, 0));
+                    int color = 0;
+                    switch (button) {
+                        case COLOR_1:
+                            color = Color.argb(100, 255, 0, 0);
+                            break;
+                        case COLOR_2:
+                            color = Color.argb(100, 0, 255, 0);
+                            break;
+                        case COLOR_3:
+                            color = Color.argb(100, 255, 255, 0);
+                            break;
+                        case COLOR_4:
+                            color = Color.argb(100, 255, 0, 255);
+                            break;
+
+                    }
+                    view = new SelectionColorButton(toolbar.getContext(), 200, 0.5f, 0.8f, 0.1f, color);
                     return view;
                 default:
                     view = ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));

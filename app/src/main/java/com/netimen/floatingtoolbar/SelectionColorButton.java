@@ -16,14 +16,16 @@ import android.widget.ToggleButton;
 
 public class SelectionColorButton extends ToggleButton {
 
+    private final int size;
     private final float innerRadiusRatio;
     private final float outerRadiusRatio;
     private final float gapRatio;
     private final int color;
     private Paint paint, strokePaint;
 
-    public SelectionColorButton(Context context, float innerRadiusRatio, float outerRadiusRatio, float gapRatio, int color) {
+    public SelectionColorButton(Context context, int size, float innerRadiusRatio, float outerRadiusRatio, float gapRatio, int color) {
         super(context);
+        this.size = size;
         this.innerRadiusRatio = innerRadiusRatio;
         this.outerRadiusRatio = outerRadiusRatio;
         this.gapRatio = gapRatio;
@@ -57,7 +59,7 @@ public class SelectionColorButton extends ToggleButton {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        super.onMeasure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY));
         strokePaint.setStrokeWidth(getMeasuredHeight() / 2 * (outerRadiusRatio - gapRatio - innerRadiusRatio));
     }
 

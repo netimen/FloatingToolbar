@@ -119,6 +119,14 @@ public class DemoActivity extends AppCompatActivity {
                         case CHOOSE_COLOR:
                             toolbar.showPanel(1); // CUR move 1 somewhere
                             break;
+                        case COLOR_1:
+                        case COLOR_2:
+                        case COLOR_3:
+                        case COLOR_4: // no break before default intentionally!
+                            final Button[] colorButtons = {Button.COLOR_1, Button.COLOR_2, Button.COLOR_3, Button.COLOR_4};
+                            for (Button colorButton : colorButtons)
+                                if (colorButton != button)
+                                    ((SelectionColorButton)toolbar.getActionView(colorButton)).setChecked(false);
                         default:
                             Toast.makeText(toolbar.getContext(), button.selectionAction.toString(), Toast.LENGTH_LONG).show();
                             toolbar.hide(false);
@@ -148,7 +156,7 @@ public class DemoActivity extends AppCompatActivity {
                             break;
 
                     }
-                    view = new SelectionColorButton(toolbar.getContext(), 200, 0.5f, 0.8f, 0.1f, color);
+                    view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, color);
                     return view;
                 default:
                     view = ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));

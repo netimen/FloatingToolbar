@@ -191,6 +191,18 @@ public class FloatingToolbar extends FrameLayout {
         anim.start();
     }
 
+    /**
+     * tries to find view corresponding to specified object in all the panels
+     */
+    public View getActionView(Object o) {
+        for (int i = 0; i < getPanelCount(); i++) { // skipping background child
+            final View actionView = getPanel(i).getActionView(o);
+            if (actionView != null)
+                return actionView;
+        }
+        return null;
+    }
+
 //    public class SimpleAdapter extends ArrayAdapter<T> {
 //
 //        public SimpleAdapter(Context context, int resource, T[] actions) {

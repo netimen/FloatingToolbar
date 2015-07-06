@@ -1,5 +1,6 @@
 package com.netimen.floatingtoolbar;
 
+import android.graphics.Color;
 import android.graphics.Point;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
@@ -114,7 +115,7 @@ public class DemoActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     switch (button) {
                         case CHOOSE_COLOR:
-                            toolbar.showPanel(1); // CUR refactor
+                            toolbar.showPanel(1); // CUR move 1 somewhere
                             break;
                         default:
                             Toast.makeText(toolbar.getContext(), button.selectionAction.toString(), Toast.LENGTH_LONG).show();
@@ -129,7 +130,7 @@ public class DemoActivity extends AppCompatActivity {
             View view;
             switch (button.type) {
                 case ICON:
-                    view = new SelectionColorButton(toolbar.getContext(), 0.5f, 0.8f, 0.1f); // CUR size
+                    view = new SelectionColorButton(toolbar.getContext(), 0.5f, 0.8f, 0.1f, button == Button.COLOR_1 ? Color.argb(100, 255, 0, 0) : Color.argb(100, 0, 255, 0));
                     return view;
                 default:
                     view = ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));

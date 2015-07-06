@@ -19,19 +19,30 @@ public class SelectionColorButton extends ToggleButton {
     private final float innerRadiusRatio;
     private final float outerRadiusRatio;
     private final float gapRatio;
+    private final int color;
     private Paint paint, strokePaint;
 
-    public SelectionColorButton(Context context, float innerRadiusRatio, float outerRadiusRatio, float gapRatio) {
+    public SelectionColorButton(Context context, float innerRadiusRatio, float outerRadiusRatio, float gapRatio, int color) {
         super(context);
         this.innerRadiusRatio = innerRadiusRatio;
         this.outerRadiusRatio = outerRadiusRatio;
         this.gapRatio = gapRatio;
+        this.color = color;
         setBackground(null);
+
         paint = new Paint();
-        paint.setColor(Color.WHITE);
         strokePaint = new Paint();
-        strokePaint.setColor(Color.WHITE);
         strokePaint.setStyle(Paint.Style.STROKE);
+        setupColors(Color.WHITE); // CUR
+    }
+
+    /**
+     * this button displays color of marker blended with background color
+     */
+    public void setupColors(int bgColor) {
+        final int color = Utils.blendColors(this.color, bgColor);
+        strokePaint.setColor(color);
+        paint.setColor(color);
     }
 
     @Override
@@ -49,4 +60,5 @@ public class SelectionColorButton extends ToggleButton {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         strokePaint.setStrokeWidth(getMeasuredHeight() / 2 * (outerRadiusRatio - gapRatio - innerRadiusRatio));
     }
+
 }

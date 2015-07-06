@@ -162,6 +162,8 @@ public class DemoActivity extends AppCompatActivity {
                 case ICON:
                     view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, markersColors[Button.colorButtons.indexOf(button)]);
                     return view;
+                case NOTE_ICON:
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), toolbar.getResources().getString(button.captionRes));
                 case CHOOSE_COLOR_ICON:
                     return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), toolbar.getResources().getString(button.captionRes));
                 default:

@@ -15,7 +15,6 @@ import android.graphics.Point;
 import android.support.annotation.LayoutRes;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -58,17 +57,8 @@ public class FloatingToolbar extends FrameLayout {
                 Log.d(LOG_TAG, "onGlobalLayout: pW: " + currentContainerWidth + " w: " + containerWidth);
                 if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     currentContainerWidth = containerWidth;
-                    int maxHeight = 0;
-                    for (int i = 0; i < getPanelCount(); i++) { // skipping background child
-                        final Panel panel = getPanel(i);
-                        panel.relayout(containerWidth);
-                        if (panel.getMeasuredHeight() > maxHeight)
-                            maxHeight = panel.getMeasuredHeight();
-                    }
-
-                    final ViewGroup.LayoutParams layoutParams = backgroundView.getLayoutParams();
-                    layoutParams.height = maxHeight;
-                    backgroundView.setLayoutParams(layoutParams);
+                    for (int i = 0; i < getPanelCount(); i++)
+                        getPanel(i).relayout(containerWidth);
                 }
             }
         });
@@ -86,14 +76,14 @@ public class FloatingToolbar extends FrameLayout {
         backgroundView.setBackground(getBackground());
         setBackground(null); // without this they share common drawable with Toolbar
         setBackgroundColor(Color.TRANSPARENT);
-        addView(backgroundView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        addView(backgroundView, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     public int addPanel(Adapter adapter) {
         final Panel panel = new Panel(getContext(), adapter);
         if (getPanelCount() > 0) // initially only first panel is visible
             panel.setVisibility(INVISIBLE);
-        addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return getPanelCount() - 1; // index of this panel
     }
 

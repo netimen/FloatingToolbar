@@ -19,7 +19,7 @@ import android.text.style.TypefaceSpan;
 public class CustomFontHelper { // http://bluejamesbond.github.io/CharacterMap/
 
     @SuppressWarnings("SameParameterValue")
-    public static Spannable setCustomFontText(Context context, CharSequence text) {
+    public static Spannable getCustomFontText(Context context, CharSequence text) {
         Spannable spannable = Spannable.Factory.getInstance().newSpannable(text);
         Typeface tf = Typeface.createFromAsset(context.getAssets(), "selection_icons.ttf");
         spannable.setSpan(new CustomTypefaceSpan("", tf), 0, spannable.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);

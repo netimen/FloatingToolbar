@@ -18,6 +18,6 @@ public class CustomFontView extends TextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        super.setText(CustomFontHelper.setCustomFontText(getContext(), text), type);
+        super.setText(CustomFontHelper.getCustomFontText(getContext(), text), type);
     }
 }

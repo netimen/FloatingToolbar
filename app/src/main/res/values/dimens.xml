@@ -8,4 +8,5 @@
     <dimen name="selection_quote_small_radius">11dp</dimen>
     <dimen name="selection_quote_big_radius">14dp</dimen>
     <dimen name="button_stroke_width_medium">2dp</dimen>
+    <dimen name="selection_toolbar_height">100dp</dimen>
 </resources>

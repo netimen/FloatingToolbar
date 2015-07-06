@@ -1,6 +1,8 @@
 package com.netimen.floatingtoolbar;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,10 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.IntArrayRes;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 @EActivity(R.layout.activity_demo)
@@ -24,17 +30,63 @@ public class DemoActivity extends AppCompatActivity {
         QUOTE, NOTE, SHARE, COPY, TRANSLATE, PROBLEM, DELETE
     }
 
+    private enum ButtonType {
+        TEXT_ICON, QUOTE_ICON, NOTE_ICON, CHOOSE_COLOR_ICON, ICON
+    }
+
+    protected enum Button {
+        QUOTE(ButtonType.QUOTE_ICON, "", R.string.quote, SelectionAction.QUOTE),
+        NOTE(ButtonType.NOTE_ICON, "", R.string.note, SelectionAction.NOTE),
+        TRANSLATE(ButtonType.TEXT_ICON, "r", R.string.translate, SelectionAction.TRANSLATE),
+        SHARE(ButtonType.TEXT_ICON, "h", R.string.share, SelectionAction.QUOTE),
+        COPY(ButtonType.TEXT_ICON, "c", R.string.copy, SelectionAction.COPY),
+        PROBLEM(ButtonType.TEXT_ICON, "!", R.string.problem, SelectionAction.PROBLEM),
+        DELETE(ButtonType.TEXT_ICON, "t", R.string.delete, SelectionAction.DELETE),
+        CHOOSE_COLOR(ButtonType.CHOOSE_COLOR_ICON, "", R.string.quote, SelectionAction.QUOTE),
+        COLOR_1(ButtonType.ICON, SelectionAction.QUOTE),
+        COLOR_2(ButtonType.ICON, SelectionAction.QUOTE),
+        COLOR_3(ButtonType.ICON, SelectionAction.QUOTE),
+        COLOR_4(ButtonType.ICON, SelectionAction.QUOTE),
+        COLOR_5(ButtonType.ICON, SelectionAction.QUOTE);
+
+
+        static final List<Button> colorButtons = Arrays.asList(COLOR_1, COLOR_2, COLOR_3, COLOR_4, COLOR_5);
+
+        private final ButtonType type;
+        private final CharSequence iconString; // index to get icon from custom font
+        private final int captionRes;
+        private final SelectionAction selectionAction;
+
+        Button(ButtonType type, CharSequence iconString, @StringRes int captionRes, SelectionAction selectionAction) {
+            this.type = type;
+            this.iconString = iconString;
+            this.captionRes = captionRes;
+            this.selectionAction = selectionAction;
+        }
+
+        Button(ButtonType buttonType, SelectionAction selectionAction) {
+            this(buttonType, "", 0, selectionAction);
+        }
+    }
+
     @ViewById
     FrameLayout mainContainer;
 
     @ViewById
     FloatingToolbar floatingToolbar;
 
+    @IntArrayRes
+    int markersColors[];
+
+    private int currentColorIndex;
+    private int bgColor = Color.WHITE;
+
+
     @AfterViews
     void ready() {
         mainContainer.setClipChildren(false);
-        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, new ActionAdapter.Button[]{ActionAdapter.Button.CHOOSE_COLOR, ActionAdapter.Button.NOTE, ActionAdapter.Button.TRANSLATE, ActionAdapter.Button.SHARE, ActionAdapter.Button.COPY, ActionAdapter.Button.PROBLEM, ActionAdapter.Button.DELETE}));
-        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, new ActionAdapter.Button[]{ActionAdapter.Button.COLOR_1, ActionAdapter.Button.COLOR_2, ActionAdapter.Button.COLOR_3, ActionAdapter.Button.COLOR_4}));
+        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, Arrays.asList(Button.CHOOSE_COLOR, Button.NOTE, Button.TRANSLATE, Button.SHARE, Button.COPY, Button.PROBLEM, Button.DELETE)));
+        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, Button.colorButtons));
         floatingToolbar.setVisibility(View.GONE);
     }
 
@@ -47,48 +99,12 @@ public class DemoActivity extends AppCompatActivity {
                 floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft(), (int) e.getY() - mainContainer.getPaddingTop()));
     }
 
-    private static class ActionAdapter extends BaseAdapter {
-
-        private enum ButtonType {
-            TEXT_ICON, QUOTE_ICON, NOTE_ICON, CHOOSE_COLOR_ICON, ICON
-        }
-
-        protected enum Button {
-            QUOTE(ButtonType.QUOTE_ICON, "", R.string.quote, SelectionAction.QUOTE),
-            NOTE(ButtonType.NOTE_ICON, "", R.string.note, SelectionAction.NOTE),
-            TRANSLATE(ButtonType.TEXT_ICON, "r", R.string.translate, SelectionAction.TRANSLATE),
-            SHARE(ButtonType.TEXT_ICON, "h", R.string.share, SelectionAction.QUOTE),
-            COPY(ButtonType.TEXT_ICON, "c", R.string.copy, SelectionAction.COPY),
-            PROBLEM(ButtonType.TEXT_ICON, "!", R.string.problem, SelectionAction.PROBLEM),
-            DELETE(ButtonType.TEXT_ICON, "t", R.string.delete, SelectionAction.DELETE),
-            CHOOSE_COLOR(ButtonType.CHOOSE_COLOR_ICON, "", R.string.quote, SelectionAction.QUOTE),
-            COLOR_1(ButtonType.ICON, SelectionAction.QUOTE),
-            COLOR_2(ButtonType.ICON, SelectionAction.QUOTE),
-            COLOR_3(ButtonType.ICON, SelectionAction.QUOTE),
-            COLOR_4(ButtonType.ICON, SelectionAction.QUOTE);
-
-
-            private final ButtonType type;
-            private final CharSequence iconString; // index to get icon from custom font
-            private final int captionRes;
-            private final SelectionAction selectionAction;
-
-            Button(ButtonType type, CharSequence iconString, @StringRes int captionRes, SelectionAction selectionAction) {
-                this.type = type;
-                this.iconString = iconString;
-                this.captionRes = captionRes;
-                this.selectionAction = selectionAction;
-            }
-
-            Button(ButtonType buttonType, SelectionAction selectionAction) {
-                this(buttonType, "", 0, selectionAction);
-            }
-        }
+    private class ActionAdapter extends BaseAdapter {
 
         private final FloatingToolbar toolbar;
-        private final Button[] buttons;
+        private final List<Button> buttons;
 
-        ActionAdapter(FloatingToolbar toolbar, Button[] buttons) {
+        ActionAdapter(FloatingToolbar toolbar, List<Button> buttons) {
             this.toolbar = toolbar;
             this.buttons = buttons;
         }
@@ -100,12 +116,12 @@ public class DemoActivity extends AppCompatActivity {
 
         @Override
         public Object getItem(int position) {
-            return buttons[position];
+            return buttons.get(position);
         }
 
         @Override
         public int getCount() {
-            return buttons.length;
+            return buttons.size();
         }
 
         @Override
@@ -122,11 +138,13 @@ public class DemoActivity extends AppCompatActivity {
                         case COLOR_1:
                         case COLOR_2:
                         case COLOR_3:
-                        case COLOR_4: // no break before default intentionally!
-                            final Button[] colorButtons = {Button.COLOR_1, Button.COLOR_2, Button.COLOR_3, Button.COLOR_4};
-                            for (Button colorButton : colorButtons)
+                        case COLOR_4:
+                        case COLOR_5: // no break before default intentionally!
+                            toolbar.getActionView(Button.CHOOSE_COLOR).invalidate();
+                            currentColorIndex = Button.colorButtons.indexOf(button);
+                            for (Button colorButton : Button.colorButtons)
                                 if (colorButton != button)
-                                    ((SelectionColorButton)toolbar.getActionView(colorButton)).setChecked(false);
+                                    ((SelectionColorButton) toolbar.getActionView(colorButton)).setChecked(false);
                         default:
                             Toast.makeText(toolbar.getContext(), button.selectionAction.toString(), Toast.LENGTH_LONG).show();
                             toolbar.hide(false);
@@ -140,29 +158,29 @@ public class DemoActivity extends AppCompatActivity {
             View view;
             switch (button.type) {
                 case ICON:
-                    int color = 0;
-                    switch (button) {
-                        case COLOR_1:
-                            color = Color.argb(100, 255, 0, 0);
-                            break;
-                        case COLOR_2:
-                            color = Color.argb(100, 0, 255, 0);
-                            break;
-                        case COLOR_3:
-                            color = Color.argb(100, 255, 255, 0);
-                            break;
-                        case COLOR_4:
-                            color = Color.argb(100, 255, 0, 255);
-                            break;
-
-                    }
-                    view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, color);
+                    view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, markersColors[Button.colorButtons.indexOf(button)]);
                     return view;
+                case CHOOSE_COLOR_ICON:
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), toolbar.getResources().getString(button.captionRes));
                 default:
-                    view = ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
-                    return view;
+                    return ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
             }
         }
     }
 
+    private class ChooseColorIconRenderer implements DynamicIconView.IconRenderer {
+        Paint paint = new Paint();
+
+        @Override
+        public void draw(Canvas canvas) {
+            final float r = canvas.getWidth() / 3, y = canvas.getHeight() / 2;
+            int circlesNumber = 3;
+            paint.setColor(Utils.blendColors(markersColors[currentColorIndex == 2 ? circlesNumber : 2], bgColor));
+            canvas.drawCircle(canvas.getWidth() - r, y, r, paint);
+            paint.setColor(Utils.blendColors(markersColors[currentColorIndex == 1 ? circlesNumber : 1], bgColor));
+            canvas.drawCircle(canvas.getWidth() - r - r / 2, y, r, paint);
+            paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
+            canvas.drawCircle(r, y, r, paint);
+        }
+    }
 }

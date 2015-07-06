@@ -3,7 +3,7 @@
  * All Rights Reserved.
  * <p/>
  * Author: Dmitry Gordeev <netimen@dreamindustries.co>
- * Date:   30.06.15
+ * Date:   06.07.15
  */
 package com.netimen.floatingtoolbar;
 
@@ -15,18 +15,25 @@ import android.widget.TextView;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
-@EViewGroup(R.layout.action_view)
-public class ActionView extends RelativeLayout {
+@EViewGroup(R.layout.dynamic_icon_action_view)
+public class DynamicIconActionView extends RelativeLayout {
     @ViewById
-    TextView icon, caption;
+    TextView caption;
 
-    public ActionView(Context context) {
+    @ViewById
+    DynamicIconView icon;
+
+    public DynamicIconActionView(Context context) {
         super(context);
     }
 
-    public View bind(CharSequence icon, String caption) {
-        this.icon.setText(icon);
+    public View bind(DynamicIconView.IconRenderer iconRenderer, String caption) {
+        icon.setRenderer(iconRenderer);
         this.caption.setText(caption);
         return this;
+    }
+
+    DynamicIconView.IconRenderer getIconRenderer() { // CUR remove?
+        return icon.renderer;
     }
 }

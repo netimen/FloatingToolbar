@@ -27,11 +27,19 @@ public class DynamicIconView extends View {
         renderer.draw(canvas);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        renderer.onMeasure(getMeasuredWidth(), getMeasuredHeight());
+    }
+
     public void setRenderer(IconRenderer renderer) {
         this.renderer = renderer;
     }
 
     public interface IconRenderer {
         void draw(Canvas canvas);
+
+        void onMeasure(int measuredWidth, int measuredHeight);
     }
 }

@@ -4,6 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.support.annotation.ColorInt;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -79,7 +81,8 @@ public class DemoActivity extends AppCompatActivity {
     int markersColors[];
 
     private int currentColorIndex;
-    private int bgColor = Color.WHITE;
+    @ColorInt
+    private int bgColor = Color.WHITE, textColor = Color.BLACK;
 
 
     @AfterViews
@@ -170,10 +173,12 @@ public class DemoActivity extends AppCompatActivity {
 
     private class ChooseColorIconRenderer implements DynamicIconView.IconRenderer {
         Paint paint = new Paint();
+        private float r, y;
+        final String text = "A";
+        private Rect textRect = new Rect();
 
         @Override
         public void draw(Canvas canvas) {
-            final float r = canvas.getWidth() / 3, y = canvas.getHeight() / 2;
             int circlesNumber = 3;
             paint.setColor(Utils.blendColors(markersColors[currentColorIndex == 2 ? circlesNumber : 2], bgColor));
             canvas.drawCircle(canvas.getWidth() - r, y, r, paint);
@@ -181,6 +186,17 @@ public class DemoActivity extends AppCompatActivity {
             canvas.drawCircle(canvas.getWidth() - r - r / 2, y, r, paint);
             paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
             canvas.drawCircle(r, y, r, paint);
+            paint.setColor(textColor);
+            canvas.drawText(text, r - textRect.width() / 2, y + textRect.height() / 2, paint);
+        }
+
+        @Override
+        public void onMeasure(int measuredWidth, int measuredHeight) {
+            r = measuredWidth / 3;
+            y = measuredHeight / 2;
+            final float textSize = r * 3 / 2;
+            paint.setTextSize(textSize);
+            paint.getTextBounds(text, 0, text.length(), textRect);
         }
     }
 }

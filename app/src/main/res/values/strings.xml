@@ -15,4 +15,5 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget sem vitae nul
     <string name="copy">copy</string>
     <string name="problem">problem</string>
     <string name="delete">delete</string>
+    <string name="selection_quote">A</string>
 </resources>

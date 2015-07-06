@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.support.annotation.ColorInt;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
@@ -174,8 +173,7 @@ public class DemoActivity extends AppCompatActivity {
     private class ChooseColorIconRenderer implements DynamicIconView.IconRenderer {
         Paint paint = new Paint();
         private float r, y;
-        final String text = "A";
-        private Rect textRect = new Rect();
+        private final TextCenterRenderer textRenderer = new TextCenterRenderer(getString(R.string.selection_quote));
 
         @Override
         public void draw(Canvas canvas) {
@@ -186,17 +184,14 @@ public class DemoActivity extends AppCompatActivity {
             canvas.drawCircle(canvas.getWidth() - r - r / 2, y, r, paint);
             paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
             canvas.drawCircle(r, y, r, paint);
-            paint.setColor(textColor);
-            canvas.drawText(text, r - textRect.width() / 2, y + textRect.height() / 2, paint);
+            textRenderer.draw(canvas, r, y);
         }
 
         @Override
         public void onMeasure(int measuredWidth, int measuredHeight) {
             r = measuredWidth / 3;
             y = measuredHeight / 2;
-            final float textSize = r * 3 / 2;
-            paint.setTextSize(textSize);
-            paint.getTextBounds(text, 0, text.length(), textRect);
+            textRenderer.onMeasure(r);
         }
     }
 }

@@ -21,7 +21,8 @@ public class SelectionColorButton extends ToggleButton {
     private final float outerRadiusRatio;
     private final float gapRatio;
     private final int color;
-    private Paint paint, strokePaint;
+    private final Paint paint, strokePaint;
+    private final TextCenterRenderer textRenderer;
 
     public SelectionColorButton(Context context, int size, float innerRadiusRatio, float outerRadiusRatio, float gapRatio, int color) {
         super(context);
@@ -36,6 +37,7 @@ public class SelectionColorButton extends ToggleButton {
         strokePaint = new Paint();
         strokePaint.setStyle(Paint.Style.STROKE);
         setupColors(Color.WHITE); // CUR
+        textRenderer = new TextCenterRenderer(getContext().getString(R.string.selection_quote));
     }
 
     /**
@@ -49,18 +51,24 @@ public class SelectionColorButton extends ToggleButton {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        final int radius = calcRadius();
         final int cx = getWidth() / 2;
-        final int cy = getHeight() / 2;
-        final int radius = getHeight() / 2;
-        canvas.drawCircle(cx, cy, radius * innerRadiusRatio, paint);
-        if (isChecked())
-            canvas.drawCircle(cx, cy, radius * outerRadiusRatio, strokePaint);
+        canvas.drawCircle(cx, radius, radius * innerRadiusRatio, paint);
+        if (isChecked()) {
+            canvas.drawCircle(cx, radius, radius * outerRadiusRatio, strokePaint);
+            textRenderer.draw(canvas, cx, radius);
+        }
+    }
+
+    private int calcRadius() {
+        return getMeasuredHeight() / 2;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY));
         strokePaint.setStrokeWidth(getMeasuredHeight() / 2 * (outerRadiusRatio - gapRatio - innerRadiusRatio));
+        textRenderer.onMeasure(calcRadius() * innerRadiusRatio);
     }
 
 }

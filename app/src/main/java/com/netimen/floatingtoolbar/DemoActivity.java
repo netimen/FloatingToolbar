@@ -210,14 +210,20 @@ public class DemoActivity extends AppCompatActivity {
 
         @Override
         public void draw(Canvas canvas) {
-            int circlesNumber = 3;
-            paint.setColor(Utils.blendColors(markersColors[currentColorIndex == 2 ? circlesNumber : 2], bgColor));
+            paint.setColor(blendColor(markersColors[(currentColorIndex + 2) % markersColors.length], .33));
             canvas.drawCircle(canvas.getWidth() - r, y, r, paint);
-            paint.setColor(Utils.blendColors(markersColors[currentColorIndex == 1 ? circlesNumber : 1], bgColor));
+
+            paint.setColor(blendColor(markersColors[(currentColorIndex + 1) % markersColors.length], .66));
             canvas.drawCircle(canvas.getWidth() - r - r / 2, y, r, paint);
+
             paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
             canvas.drawCircle(r, y, r, paint);
+
             textRenderer.draw(canvas, r, y);
+        }
+
+        private int blendColor(int color, double alpha) {
+            return Color.rgb(((int) (Color.red(color) * alpha)), ((int) (Color.green(color) * alpha)), (int) (Color.blue(color) * alpha));
         }
 
         @Override
@@ -228,4 +234,4 @@ public class DemoActivity extends AppCompatActivity {
         }
     }
 } // CUR
-// 1. padding right, cycle circles, don't remove other circle, shadow on 5.0
+// 1. padding right

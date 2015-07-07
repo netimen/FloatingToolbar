@@ -45,6 +45,12 @@ public class SelectionColorButton extends ToggleButton {
         setupColors(Color.WHITE); // CUR
     }
 
+    @Override
+    public void setChecked(boolean checked) {
+        super.setChecked(checked);
+        setEnabled(!checked); // so user can't uncheck
+    }
+
     /**
      * this button displays color of marker blended with background color
      */

@@ -3,10 +3,10 @@
     <color name="toolbar_bg">#D6000000</color>
     <color name="semi_transparent">#44000000</color>
     <array name="markers_colors">
-        <item>#BBF9D545</item>
-        <item>#4BFF4c39</item>
-        <item>#4B4569F9</item>
-        <item>#4BDAFB8f</item>
-        <item>#4BFBAF8F</item>
+        <item>#ffe270</item>
+        <item>#ffc4b8</item>
+        <item>#98cfff</item>
+        <item>#c2ee72</item>
+        <item>#d3d3d3</item>
     </array>
 </resources>

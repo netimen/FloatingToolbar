@@ -147,6 +147,7 @@ public class DemoActivity extends AppCompatActivity {
                         case COLOR_4:
                         case COLOR_5: // no break before default intentionally!
                             toolbar.getActionView(Button.CHOOSE_COLOR).invalidate();
+                            toolbar.getActionView(Button.NOTE).invalidate();
                             currentColorIndex = Button.colorButtons.indexOf(button);
                             for (Button colorButton : Button.colorButtons)
                                 if (colorButton != button)
@@ -194,10 +195,9 @@ public class DemoActivity extends AppCompatActivity {
             canvas.drawCircle(r, cy, r, paint);
             textRenderer.draw(canvas, r, cy);
             paint.setColor(markersColors[currentColorIndex]);
-//            paint.setColor(Color.RED);
             paint.setStrokeWidth(3);
-            final int lineWidth = r, lineY = cy + r / 2;
-            canvas.drawLine(r - lineWidth / 2, lineY, r + lineWidth / 2, lineY, paint);
+            final int lineY = cy + r / 2;
+            canvas.drawLine(r - r / 2, lineY, r + r / 2, lineY, paint);
         }
 
         @Override
@@ -228,4 +228,4 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-} // CUR width, invalidate, styling color buttons and alignment
+} // CUR width, styling color buttons and alignment

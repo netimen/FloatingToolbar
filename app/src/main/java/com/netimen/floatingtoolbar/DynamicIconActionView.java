@@ -34,5 +34,11 @@ public class DynamicIconActionView extends RelativeLayout {
         this.caption.setText(caption);
         return this;
     }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        icon.invalidate(); // without this icon doesn't get invalidated http://stackoverflow.com/a/21814939/190148
+    }
 }
 

@@ -73,8 +73,6 @@ public class Panel extends FrameLayout { // CUR remove param
             currentContainerWidth += actionView.getMeasuredWidth();
         }
 
-        measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(getToolbar().getLayoutParams().height, MeasureSpec.EXACTLY)); // so now getMeasuredHeight also returns maxHeight. Needed to adjust parent size
-
         showContainer(containerToShow); // order is important: we first measure, then show, because background animation relies on size
     }
 
@@ -93,6 +91,9 @@ public class Panel extends FrameLayout { // CUR remove param
 
     void showContainer(int containerId) {
         final View showing = getChildAt(containerId), hiding = getChildAt(currentContainerId);
+        if (showing.getMeasuredWidth() == 0)
+            showing.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)); // need for background size adjusting
+
         if (getVisibility() == VISIBLE) {
             getToolbar().changePanels(showing, hiding); // animate, adjust background etc
         } else {

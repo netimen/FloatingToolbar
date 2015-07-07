@@ -177,6 +177,10 @@ public class DemoActivity extends AppCompatActivity {
         private float r, y;
         private final TextCenterRenderer textRenderer = new TextCenterRenderer(getString(R.string.selection_quote));
 
+        ChooseColorIconRenderer() {
+            paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        }
+
         @Override
         public void draw(Canvas canvas) {
             int circlesNumber = 3;

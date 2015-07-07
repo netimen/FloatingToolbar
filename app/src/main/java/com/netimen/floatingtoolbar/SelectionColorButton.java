@@ -34,7 +34,9 @@ public class SelectionColorButton extends ToggleButton {
         setBackground(null);
 
         paint = new Paint();
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         strokePaint = new Paint();
+        strokePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         strokePaint.setStyle(Paint.Style.STROKE);
         setupColors(Color.WHITE); // CUR
         textRenderer = new TextCenterRenderer(getContext().getString(R.string.selection_quote));

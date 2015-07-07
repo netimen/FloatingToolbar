@@ -21,6 +21,7 @@ public class TextCenterRenderer {
 
     public TextCenterRenderer(String text) {
         this.text = text;
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
     }
 
     public void onMeasure(float circleRadius) {

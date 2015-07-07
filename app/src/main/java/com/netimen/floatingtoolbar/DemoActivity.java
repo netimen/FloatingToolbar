@@ -233,5 +233,4 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-} // CUR
-// 1. padding right
+}

@@ -162,15 +162,14 @@ public class DemoActivity extends AppCompatActivity {
         }
 
         private View buildView(Button button) {
-            View view;
+            final int iconCircleRadius = selectionToolbarHeight / 5;
             switch (button.type) {
                 case ICON:
-                    view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, markersColors[Button.colorButtons.indexOf(button)]);
-                    return view;
+                    return new SelectionColorButton(toolbar.getContext(), iconCircleRadius, markersColors[Button.colorButtons.indexOf(button)]);
                 case CHOOSE_COLOR_ICON:
-                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), selectionToolbarHeight * 3 / 5, toolbar.getResources().getString(button.captionRes));
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), iconCircleRadius * 3, toolbar.getResources().getString(button.captionRes));
                 case NOTE_ICON:
-                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new NoteIconRenderer(), selectionToolbarHeight * 2 / 5, toolbar.getResources().getString(button.captionRes));
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new NoteIconRenderer(), iconCircleRadius * 2, toolbar.getResources().getString(button.captionRes));
                 default:
                     return ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
             }
@@ -228,4 +227,4 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-} // CUR width, styling color buttons and alignment
+} // CUR width

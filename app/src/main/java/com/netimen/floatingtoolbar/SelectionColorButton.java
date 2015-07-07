@@ -23,12 +23,12 @@ public class SelectionColorButton extends ToggleButton {
     private final int innerRadius, outerRadius;
 
     public SelectionColorButton(Context context, int innerRadius, int color) {
-        super(context);
+        super(context, null);
         this.innerRadius = innerRadius;
         outerRadius = (int) (innerRadius * 1.2f);
         width = (int) (outerRadius * 2.4f);
         this.color = color;
-        setBackground(null);
+        setBackgroundResource(R.drawable.bg_selection_toolbar_item);
         setPadding(0, 0, 0, 0); // overrides default toggle button's paddings
 
         paint = new Paint();

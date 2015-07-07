@@ -2,6 +2,7 @@
 <resources>
     <color name="toolbar_bg">#D6000000</color>
     <color name="semi_transparent">#44000000</color>
+    <color name="bg_selection_toolbar_item">#4569F9</color>
     <array name="markers_colors">
         <item>#ffe270</item>
         <item>#ffc4b8</item>

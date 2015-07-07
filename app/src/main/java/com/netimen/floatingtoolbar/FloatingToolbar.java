@@ -25,6 +25,7 @@ public class FloatingToolbar extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
     public static final int TECHNICAL_CHILDREN_COUNT = 1;
     private final FadeAnimator fadeAnimator;
+    private final int paddingLeft, paddingRight;
     private int currentContainerWidth;
 
     @LayoutRes
@@ -46,6 +47,9 @@ public class FloatingToolbar extends FrameLayout {
         super(context, attrs);
         fadeAnimator = new FadeAnimator(animationDuration);
 
+        paddingLeft = getPaddingLeft();
+        paddingRight = getPaddingRight();
+        setPadding(0, 0, 0, 0);  // so background doesn't get padding
         initBackground(context);
 
         moreButtonLayout = R.layout.more_button;
@@ -83,7 +87,9 @@ public class FloatingToolbar extends FrameLayout {
         final Panel panel = new Panel(getContext(), adapter);
         if (getPanelCount() > 0) // initially only first panel is visible
             panel.setVisibility(INVISIBLE);
-        addView(panel, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        final LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layoutParams.setMargins(paddingLeft, 0, paddingRight, 0);
+        addView(panel, layoutParams);
         return getPanelCount() - 1; // index of this panel
     }
 

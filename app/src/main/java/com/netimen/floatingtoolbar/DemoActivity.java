@@ -162,7 +162,7 @@ public class DemoActivity extends AppCompatActivity {
         }
 
         private View buildView(Button button) {
-            final int iconCircleRadius = selectionToolbarHeight / 5;
+            final int iconCircleRadius = (int) (selectionToolbarHeight * .18f);
             switch (button.type) {
                 case ICON:
                     return new SelectionColorButton(toolbar.getContext(), iconCircleRadius, markersColors[Button.colorButtons.indexOf(button)]);
@@ -227,4 +227,5 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-}
+} // CUR
+// 1. padding right, cycle circles, don't remove other circle, shadow on 5.0

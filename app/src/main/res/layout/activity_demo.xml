@@ -30,5 +30,7 @@
         android:id="@+id/floating_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/selection_toolbar_height"
+        android:paddingLeft="9dp"
+        android:paddingRight="9dp"
         android:background="@drawable/toolbar_bg" />
 </FrameLayout>

@@ -2,11 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="padding_small">8dp</dimen>
-    <dimen name="text_size_icon">48sp</dimen>
-    <dimen name="padding_tiny">2dp</dimen>
+    <dimen name="padding_small">7dp</dimen>
+    <dimen name="text_size_icon">40sp</dimen>
+    <dimen name="padding_tiny">3dp</dimen>
     <dimen name="selection_quote_small_radius">11dp</dimen>
     <dimen name="selection_quote_big_radius">14dp</dimen>
     <dimen name="button_stroke_width_medium">2dp</dimen>
-    <dimen name="selection_toolbar_height">60dp</dimen>
+    <dimen name="selection_toolbar_height">72dp</dimen>
 </resources>

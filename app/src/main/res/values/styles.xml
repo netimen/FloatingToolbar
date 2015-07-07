@@ -9,15 +9,27 @@
         <item name="android:padding">@dimen/padding_small</item>
     </style>
 
-    <style name="TextIcon">
+    <style name="Text">
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Text.ActionIcon">
         <item name="android:textSize">@dimen/text_size_icon</item>
     </style>
 
-    <style name="SpecialButton" parent="TextIcon">
+    <style name="SpecialButton" parent="Text.ActionIcon">
         <item name="android:paddingLeft">@dimen/padding_small</item>
         <item name="android:paddingRight">@dimen/padding_small</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="Text.ActionCaption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>

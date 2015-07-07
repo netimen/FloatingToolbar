@@ -25,7 +25,7 @@ public class TextCenterRenderer {
     }
 
     public void onMeasure(float circleRadius) {
-        final float textSize = circleRadius * 3 / 2;
+        final float textSize = circleRadius * 6 / 7;
         paint.setTextSize(textSize);
         paint.getTextBounds(text, 0, text.length(), textRect);
     }

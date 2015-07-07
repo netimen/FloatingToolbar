@@ -16,7 +16,7 @@ public class DynamicIconView extends View {
     @SuppressWarnings("unused")
     private static final String LOG_TAG = DynamicIconView.class.getSimpleName();
 
-    IconRenderer renderer;
+    private IconRenderer renderer;
 
     public DynamicIconView(Context context, AttributeSet attrs) {
         super(context, attrs);

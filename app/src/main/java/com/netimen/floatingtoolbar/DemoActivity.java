@@ -18,6 +18,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Touch;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.DimensionPixelSizeRes;
 import org.androidannotations.annotations.res.IntArrayRes;
 
 import java.util.Arrays;
@@ -79,9 +80,12 @@ public class DemoActivity extends AppCompatActivity {
     @IntArrayRes
     int markersColors[];
 
-    private int currentColorIndex;
     @ColorInt
     private int bgColor = Color.WHITE, textColor = Color.BLACK;
+    private int currentColorIndex;
+
+    @DimensionPixelSizeRes
+    int selectionToolbarHeight;
 
 
     @AfterViews
@@ -162,24 +166,43 @@ public class DemoActivity extends AppCompatActivity {
                 case ICON:
                     view = new SelectionColorButton(toolbar.getContext(), 160, 0.5f, 0.8f, 0.1f, markersColors[Button.colorButtons.indexOf(button)]);
                     return view;
-                case NOTE_ICON:
-                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), toolbar.getResources().getString(button.captionRes));
                 case CHOOSE_COLOR_ICON:
-                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), toolbar.getResources().getString(button.captionRes));
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new ChooseColorIconRenderer(), selectionToolbarHeight * 3 / 5, toolbar.getResources().getString(button.captionRes));
+                case NOTE_ICON:
+                    return DynamicIconActionView_.build(toolbar.getContext()).bind(new NoteIconRenderer(), selectionToolbarHeight * 2 / 5, toolbar.getResources().getString(button.captionRes));
                 default:
                     return ActionView_.build(toolbar.getContext()).bind(button.iconString, button.captionRes == 0 ? "" : toolbar.getResources().getString(button.captionRes));
             }
         }
     }
 
-    private class ChooseColorIconRenderer implements DynamicIconView.IconRenderer {
-        Paint paint = new Paint();
-        private float r, y;
-        private final TextCenterRenderer textRenderer = new TextCenterRenderer(getString(R.string.selection_quote));
+    private abstract class Renderer implements DynamicIconView.IconRenderer {
+        final Paint paint = new Paint();
+        final TextCenterRenderer textRenderer = new TextCenterRenderer(getString(R.string.selection_quote));
 
-        ChooseColorIconRenderer() {
+        Renderer() {
             paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         }
+    }
+
+    private class NoteIconRenderer extends Renderer {
+
+        @Override
+        public void draw(Canvas canvas) {
+            paint.setColor(bgColor);
+            final int r = canvas.getWidth() / 2, cy = canvas.getHeight() / 2;
+            canvas.drawCircle(r, cy, r, paint);
+            textRenderer.draw(canvas, r, cy);
+        }
+
+        @Override
+        public void onMeasure(int measuredWidth, int measuredHeight) {
+            textRenderer.onMeasure(measuredWidth / 2);
+        }
+    }
+
+    private class ChooseColorIconRenderer extends Renderer {
+        private float r, y;
 
         @Override
         public void draw(Canvas canvas) {

@@ -7,17 +7,13 @@
 
     <TextView
         android:id="@+id/caption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:singleLine="true"
-        android:textColor="@android:color/white"
+        style="@style/Text.ActionCaption"
         tools:text="Action" />
 
     <com.netimen.floatingtoolbar.CustomFontView
         android:id="@+id/icon"
-        style="@style/TextIcon"
+        style="@style/Text.ActionIcon"
+        android:background="@android:color/holo_red_dark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

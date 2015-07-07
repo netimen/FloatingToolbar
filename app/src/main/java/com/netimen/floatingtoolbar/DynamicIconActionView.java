@@ -27,13 +27,12 @@ public class DynamicIconActionView extends RelativeLayout {
         super(context);
     }
 
-    public View bind(DynamicIconView.IconRenderer iconRenderer, String caption) {
+    public View bind(DynamicIconView.IconRenderer iconRenderer, int iconWidth, String caption) {
         icon.setRenderer(iconRenderer);
+        icon.getLayoutParams().width = iconWidth;
+        icon.requestLayout();
         this.caption.setText(caption);
         return this;
     }
-
-    DynamicIconView.IconRenderer getIconRenderer() { // CUR remove?
-        return icon.renderer;
-    }
 }
+

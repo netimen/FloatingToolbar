@@ -227,4 +227,4 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-} // CUR width
+}

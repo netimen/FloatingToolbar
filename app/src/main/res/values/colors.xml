@@ -3,7 +3,7 @@
     <color name="toolbar_bg">#D6000000</color>
     <color name="semi_transparent">#44000000</color>
     <array name="markers_colors">
-        <item>#4BF9D545</item>
+        <item>#BBF9D545</item>
         <item>#4BFF4c39</item>
         <item>#4B4569F9</item>
         <item>#4BDAFB8f</item>

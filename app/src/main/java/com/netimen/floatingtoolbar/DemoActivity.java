@@ -193,6 +193,11 @@ public class DemoActivity extends AppCompatActivity {
             final int r = canvas.getWidth() / 2, cy = canvas.getHeight() / 2;
             canvas.drawCircle(r, cy, r, paint);
             textRenderer.draw(canvas, r, cy);
+            paint.setColor(markersColors[currentColorIndex]);
+//            paint.setColor(Color.RED);
+            paint.setStrokeWidth(3);
+            final int lineWidth = r, lineY = cy + r / 2;
+            canvas.drawLine(r - lineWidth / 2, lineY, r + lineWidth / 2, lineY, paint);
         }
 
         @Override
@@ -223,4 +228,4 @@ public class DemoActivity extends AppCompatActivity {
             textRenderer.onMeasure(r);
         }
     }
-}
+} // CUR width, invalidate, styling color buttons and alignment

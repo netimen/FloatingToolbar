@@ -21,14 +21,25 @@ import java.util.Map;
 
 /**
  * Contains the action views and layouts them so they fit the maximum width and distributes them to several containers navigable via more/back buttons if needed
- * CUR stretching
  */
 @SuppressLint("ViewConstructor")
-public class Panel extends FrameLayout { // CUR remove param
+public class Panel extends FrameLayout {
     private int currentContainerId;
     private final Adapter adapter;
     private int visibleActionPosition;
     private Map<Object, View> item2views = new HashMap<>();
+    private OnClickListener backButtonClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showContainer(currentContainerId - 1);
+        }
+    };
+    private OnClickListener moreButtonClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showContainer(currentContainerId + 1);
+        }
+    };
 
     public Panel(Context context, Adapter adapter) {
         super(context);
@@ -45,7 +56,7 @@ public class Panel extends FrameLayout { // CUR remove param
             actionView.setTag(position); // needed to easily get view position in adapter later
 
             if (currentContainerWidth + actionView.getMeasuredWidth() > containerWidth) {
-                final View moreButton = createMoreButton();
+                final View moreButton = initView(inflate(getContext(), getToolbar().moreButtonLayout, null), moreButtonClickListener);
                 addViewToContainer(moreButton);
                 if (currentContainerWidth + moreButton.getMeasuredWidth() > containerWidth) { // if even 'more' button doesn't fit, we need to remove last action view and add it to the next container
                     actionView = getCurrentContainer().getChildAt(getCurrentContainer().getChildCount() - 2); // last added action view
@@ -61,7 +72,7 @@ public class Panel extends FrameLayout { // CUR remove param
                 container.setPadding(getToolbar().paddingLeft, getToolbar().paddingTop, getToolbar().paddingRight, getToolbar().paddingBottom);
 
                 if (container.hasBackButton()) {
-                    final View backButton = createBackButton();
+                    final View backButton = initView(inflate(getContext(), getToolbar().backButtonLayout, null), backButtonClickListener);
                     addViewToContainer(backButton);
                     currentContainerWidth = backButton.getMeasuredWidth();
                 } else
@@ -109,7 +120,6 @@ public class Panel extends FrameLayout { // CUR remove param
         return (currentContainerId == -1 || currentContainerId >= getChildCount()) ? null : (Container) getChildAt(currentContainerId);
     }
 
-    /// more/back buttons
 
     public View getActionView(Object o) {
         return item2views.get(o);
@@ -120,24 +130,6 @@ public class Panel extends FrameLayout { // CUR remove param
         item2views.put(adapter.getItem(position), view);
         view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         return view;
-    }
-
-    private View createBackButton() { // CUR inline, make ClickListener a field
-        return initView(inflate(getContext(), getToolbar().backButtonLayout, null), new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showContainer(currentContainerId - 1);
-            }
-        });
-    }
-
-    private View createMoreButton() {
-        return initView(inflate(getContext(), getToolbar().moreButtonLayout, null), new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showContainer(currentContainerId + 1);
-            }
-        });
     }
 
     /**

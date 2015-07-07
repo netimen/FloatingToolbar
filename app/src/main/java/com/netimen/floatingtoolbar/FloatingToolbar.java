@@ -151,7 +151,7 @@ public class FloatingToolbar extends FrameLayout {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
     }
 
-    protected void changePanels(final View showing, final View hiding) { // CUR move to another class
+    protected void changePanels(final View showing, final View hiding) {
         changePanels(showing, hiding, true);
     }
 

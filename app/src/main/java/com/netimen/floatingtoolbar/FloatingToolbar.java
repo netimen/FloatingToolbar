@@ -30,6 +30,8 @@ public class FloatingToolbar extends FrameLayout {
      * we read paddings from style and pass them lower to the hierarchy, because if we apply it here, backgroundView also would be padded
      */
     final int paddingLeft, paddingRight, paddingTop, paddingBottom;
+    private int marginRight;
+    private int marginLeft;
     private int currentContainerWidth;
 
     @LayoutRes
@@ -59,12 +61,12 @@ public class FloatingToolbar extends FrameLayout {
 
         initBackground(context);
 
-        moreButtonLayout = R.layout.more_button;
-        backButtonLayout = R.layout.back_button; // CUR builder, attr etc
+        moreButtonLayout = R.layout.selection_toolbar_more_button;
+        backButtonLayout = R.layout.selection_toolbar_back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                final int containerWidth = ((View) getParent()).getWidth() - ((View) getParent()).getPaddingLeft() - ((View) getParent()).getPaddingRight();
+                final int containerWidth = ((View) getParent()).getWidth() - marginLeft - marginRight;
                 Log.d(LOG_TAG, "onGlobalLayout: pW: " + currentContainerWidth + " w: " + containerWidth);
                 if (currentContainerWidth != containerWidth && containerWidth > 0) { // containerWidth can be < 0 when getWidth is 0, and paddings are > 0
                     currentContainerWidth = containerWidth;
@@ -73,6 +75,13 @@ public class FloatingToolbar extends FrameLayout {
                 }
             }
         });
+    }
+
+    @Override
+    public void setLayoutParams(ViewGroup.LayoutParams params) {
+        super.setLayoutParams(params);
+        marginLeft = params instanceof MarginLayoutParams ? ((MarginLayoutParams) params).leftMargin : 0;
+        marginRight = params instanceof MarginLayoutParams ? ((MarginLayoutParams) params).rightMargin : 0;
     }
 
     private int getPanelCount() {
@@ -105,9 +114,9 @@ public class FloatingToolbar extends FrameLayout {
         resetStateIfNeeded();
 
         final MarginLayoutParams layoutParams = (MarginLayoutParams) getLayoutParams();
-        layoutParams.leftMargin = Math.min(position.x, currentContainerWidth - getMeasuredWidth()); // fitting to screen by x axis
+        layoutParams.leftMargin = marginLeft + Math.max(0, Math.min(position.x, currentContainerWidth - getMeasuredWidth())); // fitting to screen by x axis
         layoutParams.topMargin = position.y;
-        setLayoutParams(layoutParams);
+        requestLayout();
         changeVisibility(true);
     }
 

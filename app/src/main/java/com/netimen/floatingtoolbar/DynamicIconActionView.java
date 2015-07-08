@@ -15,7 +15,7 @@ import android.widget.TextView;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
-@EViewGroup(R.layout.dynamic_icon_action_view)
+@EViewGroup(R.layout.selection_toolbar_dynamic_action_view)
 public class DynamicIconActionView extends RelativeLayout {
     @ViewById
     TextView caption;

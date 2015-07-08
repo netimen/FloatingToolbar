@@ -102,7 +102,7 @@ public class DemoActivity extends AppCompatActivity {
             if (floatingToolbar.getVisibility() == View.VISIBLE)
                 floatingToolbar.hide(false);
             else
-                floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft(), (int) e.getY() - mainContainer.getPaddingTop()));
+                floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft() - 500, (int) e.getY() - mainContainer.getPaddingTop()));
     }
 
     private class ActionAdapter extends BaseAdapter {

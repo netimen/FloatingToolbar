@@ -15,7 +15,7 @@ import android.widget.TextView;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
-@EViewGroup(R.layout.action_view)
+@EViewGroup(R.layout.selection_toolbar_action_view)
 public class ActionView extends RelativeLayout {
     @ViewById
     TextView icon, caption;

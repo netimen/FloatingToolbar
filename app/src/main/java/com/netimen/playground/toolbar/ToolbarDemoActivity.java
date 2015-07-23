@@ -1,4 +1,4 @@
-package com.netimen.playground;
+package com.netimen.playground.toolbar;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,12 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.netimen.playground.toolbar.ActionView_;
-import com.netimen.playground.toolbar.DynamicIconActionView_;
-import com.netimen.playground.toolbar.DynamicIconView;
-import com.netimen.playground.toolbar.FloatingToolbar;
-import com.netimen.playground.toolbar.SelectionColorButton;
-import com.netimen.playground.toolbar.TextCenterRenderer;
+import com.netimen.playground.R;
+import com.netimen.playground.Utils;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -32,8 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@EActivity(R.layout.activity_demo)
-public class DemoActivity extends AppCompatActivity {
+@EActivity(R.layout.activity_toolbar)
+public class ToolbarDemoActivity extends AppCompatActivity {
 
     public enum SelectionAction {
         QUOTE, NOTE, SHARE, COPY, TRANSLATE, PROBLEM, DELETE

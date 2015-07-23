@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_container"
     android:layout_width="match_parent"
@@ -8,8 +9,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin">
 
         <TextView
             android:layout_width="wrap_content"
@@ -26,13 +27,15 @@
             android:text="@string/lorem_ipsum" />
     </LinearLayout>
 
-    <com.netimen.floatingtoolbar.FloatingToolbar
+    <com.netimen.playground.toolbar.FloatingToolbar
         android:id="@+id/floating_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/selection_toolbar_height"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="@drawable/bg_selection_toolbar" />
+        android:background="@drawable/bg_selection_toolbar"
+        android:paddingLeft="9dp"
+        android:paddingRight="9dp"
+        app:animationDuration="@integer/animation_normal"
+        app:moreButtonLayout="@layout/selection_toolbar_more_button" />
 </FrameLayout>

@@ -5,11 +5,12 @@
  * Author: Dmitry Gordeev <netimen@dreamindustries.co>
  * Date:   29.06.15
  */
-package com.netimen.floatingtoolbar;
+package com.netimen.playground.toolbar;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -56,8 +57,8 @@ public class Panel extends FrameLayout {
             actionView.setTag(position); // needed to easily get view position in adapter later
 
             if (currentContainerWidth + actionView.getMeasuredWidth() > containerWidth) {
-                final View moreButton = initView(inflate(getContext(), getToolbar().moreButtonLayout, null), moreButtonClickListener);
-                addViewToContainer(moreButton);
+                final View moreButton = createButton(getToolbar().moreButtonLayout, moreButtonClickListener);
+                getCurrentContainer().addView(moreButton);
                 if (currentContainerWidth + moreButton.getMeasuredWidth() > containerWidth) { // if even 'more' button doesn't fit, we need to remove last action view and add it to the next container
                     actionView = getCurrentContainer().getChildAt(getCurrentContainer().getChildCount() - 2); // last added action view
                     getCurrentContainer().removeView(actionView);
@@ -72,8 +73,8 @@ public class Panel extends FrameLayout {
                 container.setPadding(getToolbar().paddingLeft, getToolbar().paddingTop, getToolbar().paddingRight, getToolbar().paddingBottom);
 
                 if (container.hasBackButton()) {
-                    final View backButton = initView(inflate(getContext(), getToolbar().backButtonLayout, null), backButtonClickListener);
-                    addViewToContainer(backButton);
+                    final View backButton = createButton(getToolbar().backButtonLayout, backButtonClickListener);
+                    getCurrentContainer().addView(backButton);
                     currentContainerWidth = backButton.getMeasuredWidth();
                 } else
                     currentContainerWidth = 0;
@@ -81,8 +82,8 @@ public class Panel extends FrameLayout {
                 if (visibleActionPosition >= position)
                     containerToShow = currentContainerId;
             }
-            addViewToContainer(actionView);
-            currentContainerWidth += actionView.getMeasuredWidth();
+            getCurrentContainer().addView(actionView);
+            currentContainerWidth += actionView.getVisibility() == GONE ? 0 : actionView.getMeasuredWidth();
         }
 
         showContainer(containerToShow); // order is important: we first measure, then show, because background animation relies on size
@@ -91,14 +92,6 @@ public class Panel extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), heightMeasureSpec); // no horizontal crop
-    }
-
-    /**
-     * specifies view's height and sets gravity to CENTER
-     */
-    private void addViewToContainer(View view) {
-        final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        getCurrentContainer().addView(view, layoutParams);
     }
 
     void showContainer(int containerId) {
@@ -127,18 +120,24 @@ public class Panel extends FrameLayout {
 
     private View createActionView(int position) {
         final View view = adapter.getView(position, null, null);
+        measureView(view);
         item2views.put(adapter.getItem(position), view);
-        view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         return view;
     }
 
     /**
-     * measures and sets ClickListener
+     * creates more/back button, measures and sets ClickListener
      */
-    private View initView(View view, OnClickListener onClickListener) {
-        view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+    private View createButton(@LayoutRes int layoutRes, OnClickListener onClickListener) {
+        final View view = inflate(getContext(), layoutRes, null);
+        measureView(view);
         view.setOnClickListener(onClickListener);
         return view;
+    }
+
+    private void measureView(View view) {
+        view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)); // on < 4.4 on Samsungs measure() crashes without setting LP first http://stackoverflow.com/a/15750783/190148
+        view.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
     }
 
     private int getViewPositionInAdapter(View v) {

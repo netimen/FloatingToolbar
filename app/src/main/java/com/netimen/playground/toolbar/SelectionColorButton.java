@@ -5,7 +5,7 @@
  * Author: Dmitry Gordeev <netimen@dreamindustries.co>
  * Date:   03.07.15
  */
-package com.netimen.floatingtoolbar;
+package com.netimen.playground.toolbar;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,6 +13,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.widget.ToggleButton;
+
+import com.netimen.playground.R;
+import com.netimen.playground.Utils;
 
 public class SelectionColorButton extends ToggleButton {
 

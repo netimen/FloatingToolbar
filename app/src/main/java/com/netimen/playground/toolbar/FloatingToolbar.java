@@ -5,11 +5,12 @@
  * Author: Dmitry Gordeev <netimen@dreamindustries.co>
  * Date:   29.06.15
  */
-package com.netimen.floatingtoolbar;
+package com.netimen.playground.toolbar;
 
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.support.annotation.LayoutRes;
@@ -20,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Adapter;
 import android.widget.FrameLayout;
+
+import com.netimen.playground.R;
 
 public class FloatingToolbar extends FrameLayout {
     private static final String LOG_TAG = FloatingToolbar.class.getSimpleName();
@@ -35,8 +38,8 @@ public class FloatingToolbar extends FrameLayout {
     private int currentContainerWidth;
 
     @LayoutRes
-    int moreButtonLayout, backButtonLayout;
-    private int animationDuration = 300;
+    final int moreButtonLayout, backButtonLayout;
+    private final int animationDuration;
     private View backgroundView;
     private int currentPanelId;
     /**
@@ -51,6 +54,11 @@ public class FloatingToolbar extends FrameLayout {
 
     public FloatingToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingToolbar);
+        animationDuration = a.getInt(R.styleable.FloatingToolbar_animationDuration, 0);
+        moreButtonLayout = a.getResourceId(R.styleable.FloatingToolbar_moreButtonLayout, 0);
+        backButtonLayout = a.getResourceId(R.styleable.FloatingToolbar_backButtonLayout, 0);
+        a.recycle();
         fadeAnimator = new FadeAnimator(animationDuration);
 
         paddingLeft = getPaddingLeft();
@@ -61,8 +69,6 @@ public class FloatingToolbar extends FrameLayout {
 
         initBackground(context);
 
-        moreButtonLayout = R.layout.selection_toolbar_more_button;
-        backButtonLayout = R.layout.selection_toolbar_back_button; // CUR builder, attr etc
         getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {

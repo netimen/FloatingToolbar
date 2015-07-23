@@ -1,4 +1,4 @@
-package com.netimen.floatingtoolbar;
+package com.netimen.playground;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,6 +13,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.netimen.playground.toolbar.ActionView_;
+import com.netimen.playground.toolbar.DynamicIconActionView_;
+import com.netimen.playground.toolbar.DynamicIconView;
+import com.netimen.playground.toolbar.FloatingToolbar;
+import com.netimen.playground.toolbar.SelectionColorButton;
+import com.netimen.playground.toolbar.TextCenterRenderer;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -91,7 +98,7 @@ public class DemoActivity extends AppCompatActivity {
     @AfterViews
     void ready() {
         mainContainer.setClipChildren(false);
-        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, Arrays.asList(Button.CHOOSE_COLOR, Button.NOTE, Button.TRANSLATE, Button.SHARE, Button.COPY, Button.PROBLEM, Button.DELETE)));
+        floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, Arrays.asList(Button.QUOTE, Button.CHOOSE_COLOR, Button.NOTE, Button.TRANSLATE, Button.SHARE, Button.COPY, Button.PROBLEM, Button.DELETE)));
         floatingToolbar.addPanel(new ActionAdapter(floatingToolbar, Button.colorButtons));
         floatingToolbar.setVisibility(View.GONE);
     }
@@ -102,7 +109,7 @@ public class DemoActivity extends AppCompatActivity {
             if (floatingToolbar.getVisibility() == View.VISIBLE)
                 floatingToolbar.hide(false);
             else
-                floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft() - 500, (int) e.getY() - mainContainer.getPaddingTop()));
+                floatingToolbar.show(new Point((int) e.getX() - mainContainer.getPaddingLeft(), (int) e.getY() - mainContainer.getPaddingTop()));
     }
 
     private class ActionAdapter extends BaseAdapter {
@@ -134,6 +141,8 @@ public class DemoActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             final Button button = (Button) getItem(position);
             final View view = buildView(button);
+            if (button == Button.QUOTE || button == Button.CHOOSE_COLOR || button == Button.NOTE)
+                view.setVisibility(View.GONE);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -179,9 +188,38 @@ public class DemoActivity extends AppCompatActivity {
     private abstract class Renderer implements DynamicIconView.IconRenderer {
         final Paint paint = new Paint();
         final TextCenterRenderer textRenderer = new TextCenterRenderer(getString(R.string.selection_quote));
+        int circleRadius;
 
         Renderer() {
             paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        }
+
+        @Override
+        public void onMeasure(int measuredWidth, int measuredHeight) {
+            circleRadius = calcRadius(measuredWidth, measuredHeight);
+            textRenderer.onMeasure(circleRadius);
+        }
+
+        protected abstract int calcRadius(int measuredWidth, int measuredHeight);
+    }
+
+    private class QuoteIconRenderer extends Renderer {
+
+        @Override
+        protected int calcRadius(int measuredWidth, int measuredHeight) {
+            return measuredWidth / 2;
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            drawCurrentColorCircle(canvas, canvas.getHeight() / 2);
+        }
+
+        void drawCurrentColorCircle(Canvas canvas, int y) {
+            paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
+            canvas.drawCircle(circleRadius, y, circleRadius, paint);
+
+            textRenderer.draw(canvas, circleRadius, y);
         }
     }
 
@@ -190,47 +228,44 @@ public class DemoActivity extends AppCompatActivity {
         @Override
         public void draw(Canvas canvas) {
             paint.setColor(bgColor);
-            final int r = canvas.getWidth() / 2, cy = canvas.getHeight() / 2;
-            canvas.drawCircle(r, cy, r, paint);
-            textRenderer.draw(canvas, r, cy);
+            final int y = canvas.getHeight() / 2;
+            canvas.drawCircle(circleRadius, y, circleRadius, paint);
+            textRenderer.draw(canvas, circleRadius, y);
             paint.setColor(markersColors[currentColorIndex]);
             paint.setStrokeWidth(3);
-            final int lineY = cy + r / 2;
-            canvas.drawLine(r - r / 2, lineY, r + r / 2, lineY, paint);
+            final int lineY = y + circleRadius / 2;
+            canvas.drawLine(circleRadius - circleRadius / 2, lineY, circleRadius + circleRadius / 2, lineY, paint);
         }
 
         @Override
-        public void onMeasure(int measuredWidth, int measuredHeight) {
-            textRenderer.onMeasure(measuredWidth / 2);
+        protected int calcRadius(int measuredWidth, int measuredHeight) {
+            return measuredWidth / 2;
         }
     }
 
-    private class ChooseColorIconRenderer extends Renderer {
-        private float r, y;
+    private class ChooseColorIconRenderer extends QuoteIconRenderer {
 
         @Override
         public void draw(Canvas canvas) {
-            paint.setColor(blendColor(markersColors[(currentColorIndex + 2) % markersColors.length], .33));
-            canvas.drawCircle(canvas.getWidth() - r, y, r, paint);
+            final int y = canvas.getHeight() / 2;
+            paint.setColor(fadeColor(markersColors[(currentColorIndex + 2) % markersColors.length], .33));
+            canvas.drawCircle(canvas.getWidth() - circleRadius, y, circleRadius, paint);
 
-            paint.setColor(blendColor(markersColors[(currentColorIndex + 1) % markersColors.length], .66));
-            canvas.drawCircle(canvas.getWidth() - r - r / 2, y, r, paint);
+            paint.setColor(fadeColor(markersColors[(currentColorIndex + 1) % markersColors.length], .66));
+            canvas.drawCircle(canvas.getWidth() - circleRadius - circleRadius / 2, y, circleRadius, paint);
 
-            paint.setColor(Utils.blendColors(markersColors[currentColorIndex], bgColor));
-            canvas.drawCircle(r, y, r, paint);
-
-            textRenderer.draw(canvas, r, y);
-        }
-
-        private int blendColor(int color, double alpha) {
-            return Color.rgb(((int) (Color.red(color) * alpha)), ((int) (Color.green(color) * alpha)), (int) (Color.blue(color) * alpha));
+            drawCurrentColorCircle(canvas, y);
         }
 
         @Override
-        public void onMeasure(int measuredWidth, int measuredHeight) {
-            r = measuredWidth / 3;
-            y = measuredHeight / 2;
-            textRenderer.onMeasure(r);
+        protected int calcRadius(int measuredWidth, int measuredHeight) {
+            return measuredWidth / 3;
         }
+
+        private int fadeColor(int color, double alpha) {
+            return Color.rgb(((int) (Color.red(color) * alpha)), ((int) (Color.green(color) * alpha)), (int) (Color.blue(color) * alpha));
+        }
+
     }
+
 }

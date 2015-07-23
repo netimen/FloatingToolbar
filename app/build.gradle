@@ -6,7 +6,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.netimen.floatingtoolbar"
+        applicationId "com.netimen.playground"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -31,6 +31,6 @@ dependencies {
 apt {
     arguments {
         androidManifestFile variant.outputs[0].processResources.manifestFile
-        resourcePackageName "com.netimen.floatingtoolbar"
+        resourcePackageName android.defaultConfig.applicationId
     }
 }

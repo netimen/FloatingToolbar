@@ -1,4 +1,4 @@
-package com.netimen.floatingtoolbar;
+package com.netimen.playground;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

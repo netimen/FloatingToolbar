@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FloatingToolbar">
+        <attr name="animationDuration" format="integer" />
+        <attr name="moreButtonLayout" format="reference" />
+        <attr name="backButtonLayout" format="reference" />
+    </declare-styleable>
+</resources>

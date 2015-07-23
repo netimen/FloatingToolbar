@@ -11,7 +11,7 @@
         style="@style/Text.ActionCaption"
         tools:text="Action" />
 
-    <com.netimen.floatingtoolbar.DynamicIconView
+    <com.netimen.playground.toolbar.DynamicIconView
         android:id="@+id/icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

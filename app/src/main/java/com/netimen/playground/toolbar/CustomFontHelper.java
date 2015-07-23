@@ -5,7 +5,7 @@
  * Author: Dmitry Gordeev <netimen@dreamindustries.co>
  * Date:   02.07.15
  */
-package com.netimen.floatingtoolbar;
+package com.netimen.playground.toolbar;
 
 import android.content.Context;
 import android.graphics.Paint;

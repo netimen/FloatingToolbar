@@ -10,7 +10,7 @@
         style="@style/Text.ActionCaption"
         tools:text="Action" />
 
-    <com.netimen.floatingtoolbar.CustomFontView
+    <com.netimen.playground.toolbar.CustomFontView
         android:id="@+id/icon"
         style="@style/Text.ActionIcon"
         android:layout_width="wrap_content"

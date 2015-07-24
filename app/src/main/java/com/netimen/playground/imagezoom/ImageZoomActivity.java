@@ -7,6 +7,7 @@
  */
 package com.netimen.playground.imagezoom;
 
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,10 @@ public class ImageZoomActivity extends AppCompatActivity {
     private static final String LOG_TAG = ImageZoomActivity.class.getSimpleName();
 
     @ViewById
-    ImageView smallPicture, bigPicture, zoomImage;
+    ImageView smallPicture, bigPicture;
+
+    @ViewById
+    ScalableImageView zoomImage;
 
     @ViewById
     ViewGroup mainContainer;
@@ -36,6 +40,7 @@ public class ImageZoomActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private Rect initialImageBounds;
+    private Matrix imageMatrix;
 
     @AfterViews
     void ready() {
@@ -67,12 +72,18 @@ public class ImageZoomActivity extends AppCompatActivity {
             public boolean onScale(ScaleGestureDetector detector) {
                 focusX = detector.getFocusX();
                 focusY = detector.getFocusY();
+                if (zoomImage.getVisibility() == View.VISIBLE) {
+                    zoomImage.scale(detector.getScaleFactor());
+                }
                 return false;
             }
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
-                zoomImageAtPoint(focusX, focusY);
+                if (zoomImage.getVisibility() != View.VISIBLE && detector.getScaleFactor() > 1)
+                    zoomImageAtPoint(focusX, focusY);
+                else if (zoomImage.getVisibility() == View.VISIBLE && detector.getScaleFactor() < 1)
+                    hideZoomImage();
             }
 
         });
@@ -90,6 +101,7 @@ public class ImageZoomActivity extends AppCompatActivity {
 
     private void zoomImage(Drawable drawable, Rect imageBounds) {
         zoomImage.setImageDrawable(drawable);
+        zoomImage.resetScale();
         zoomImage.setVisibility(View.VISIBLE);
         initialImageBounds = imageBounds;
         Animations.showAndMove(zoomImage, imageBounds, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), true);

@@ -18,12 +18,18 @@ import com.netimen.playground.R;
 
 public class Animations {
     public static void showAndMove(final View view, final Rect startBounds, final Rect endBounds, boolean show) {
+        showAndMove(view, startBounds, endBounds, show, null);
+    }
+
+    public static void showAndMove(final View view, final Rect startBounds, final Rect endBounds, boolean show, final Runnable endAction) {
         if (show)
             view.setVisibility(View.VISIBLE);
-        animateViewBounds(view, startBounds, endBounds, show ? null : new Runnable() {
+        animateViewBounds(view, startBounds, endBounds, show ? endAction : new Runnable() {
             @Override
             public void run() {
                 view.setVisibility(View.GONE);
+                if (endAction != null)
+                    endAction.run();
             }
         });
     }

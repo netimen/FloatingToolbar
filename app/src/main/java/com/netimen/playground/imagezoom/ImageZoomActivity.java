@@ -7,8 +7,10 @@
  */
 package com.netimen.playground.imagezoom;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -20,21 +22,36 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-@EActivity(R.layout.layout_text)
+@EActivity(R.layout.activity_image_zoom)
 public class ImageZoomActivity extends AppCompatActivity {
     private static final String LOG_TAG = ImageZoomActivity.class.getSimpleName();
-    private ScaleGestureDetector scaleGestureDetector;
 
     @ViewById
-    ImageView smallPicture, bigPicture;
+    ImageView smallPicture, bigPicture, zoomImage;
+
+    private GestureDetector gestureDetector;
+    private ScaleGestureDetector scaleGestureDetector;
 
     @AfterViews
     void ready() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                zoomImageAtPoint(e.getRawX(), e.getRawY());
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+            }
+        });
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             /**
              * https://developer.android.com/reference/android/view/ScaleGestureDetector.html#getFocusX() will return nonsense in onScaleEnd, so we need to store values ourselves
              */
             private float focusX, focusY;
+
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
                 Log.e(LOG_TAG, "AAAA onScale " + detector.getCurrentSpan() + " " + detector.getPreviousSpan() + " " + detector.getFocusX());
@@ -45,15 +62,27 @@ public class ImageZoomActivity extends AppCompatActivity {
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
-                ImageView imageToZoom = isPointInsideView(focusX, focusY, bigPicture) ? bigPicture : (isPointInsideView(focusX, focusY, smallPicture) ? smallPicture : null);
-                Log.e(LOG_TAG, "AAAA onScaleEnd " + detector.getFocusX() + " " + detector.getFocusY() + " " + (imageToZoom == bigPicture) + " " + (imageToZoom == smallPicture));
+                zoomImageAtPoint(focusX, focusY);
             }
+
         });
+    }
+
+    private void zoomImageAtPoint(float x, float y) {
+        final ImageView imageToZoom = isPointInsideView(x, y, bigPicture) ? bigPicture : (isPointInsideView(x, y, smallPicture) ? smallPicture : null);
+        if (imageToZoom != null)
+            zoomImage(imageToZoom.getDrawable());
+    }
+    private void zoomImage(Drawable drawable) {
+        zoomImage.setImageDrawable(drawable);
+        zoomImage.setVisibility(View.VISIBLE);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return scaleGestureDetector.onTouchEvent(event);
+        boolean result = scaleGestureDetector.onTouchEvent(event);
+        result |= gestureDetector.onTouchEvent(event);
+        return  result;
     }
 
     public static boolean isPointInsideView(float x, float y, View view) {

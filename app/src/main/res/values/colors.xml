@@ -3,6 +3,7 @@
     <color name="semi_transparent">#44000000</color>
     <color name="toolbar_bg">#D6000000</color>
     <color name="bg_selection_toolbar_item">#4569F9</color>
+    <color name="zoom_image_background">#E0000000</color>
     <array name="markers_colors">
         <item>#ffe270</item>
         <item>#ffc4b8</item>

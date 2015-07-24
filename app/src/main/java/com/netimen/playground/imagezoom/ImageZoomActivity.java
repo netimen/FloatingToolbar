@@ -7,13 +7,14 @@
  */
 package com.netimen.playground.imagezoom;
 
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.netimen.playground.R;
@@ -29,8 +30,12 @@ public class ImageZoomActivity extends AppCompatActivity {
     @ViewById
     ImageView smallPicture, bigPicture, zoomImage;
 
+    @ViewById
+    ViewGroup mainContainer;
+
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
+    private Rect initialImageBounds;
 
     @AfterViews
     void ready() {
@@ -45,6 +50,12 @@ public class ImageZoomActivity extends AppCompatActivity {
             public void onLongPress(MotionEvent e) {
                 super.onLongPress(e);
             }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                hideZoomImage();
+                return super.onSingleTapConfirmed(e);
+            }
         });
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             /**
@@ -54,7 +65,6 @@ public class ImageZoomActivity extends AppCompatActivity {
 
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                Log.e(LOG_TAG, "AAAA onScale " + detector.getCurrentSpan() + " " + detector.getPreviousSpan() + " " + detector.getFocusX());
                 focusX = detector.getFocusX();
                 focusY = detector.getFocusY();
                 return false;
@@ -68,21 +78,28 @@ public class ImageZoomActivity extends AppCompatActivity {
         });
     }
 
+    private void hideZoomImage() {
+        Animations.showAndMove(zoomImage, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), initialImageBounds, false);
+    }
+
     private void zoomImageAtPoint(float x, float y) {
         final ImageView imageToZoom = isPointInsideView(x, y, bigPicture) ? bigPicture : (isPointInsideView(x, y, smallPicture) ? smallPicture : null);
         if (imageToZoom != null)
-            zoomImage(imageToZoom.getDrawable());
+            zoomImage(imageToZoom.getDrawable(), new Rect(imageToZoom.getLeft(), imageToZoom.getTop(), imageToZoom.getRight(), imageToZoom.getBottom()));
     }
-    private void zoomImage(Drawable drawable) {
+
+    private void zoomImage(Drawable drawable, Rect imageBounds) {
         zoomImage.setImageDrawable(drawable);
         zoomImage.setVisibility(View.VISIBLE);
+        initialImageBounds = imageBounds;
+        Animations.showAndMove(zoomImage, imageBounds, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), true);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean result = scaleGestureDetector.onTouchEvent(event);
         result |= gestureDetector.onTouchEvent(event);
-        return  result;
+        return result;
     }
 
     public static boolean isPointInsideView(float x, float y, View view) {
@@ -91,12 +108,7 @@ public class ImageZoomActivity extends AppCompatActivity {
         int viewX = location[0];
         int viewY = location[1];
 
-        //point is inside view bounds
-        if ((x > viewX && x < (viewX + view.getWidth())) &&
-                (y > viewY && y < (viewY + view.getHeight()))) {
-            return true;
-        } else {
-            return false;
-        }
+        return (x > viewX && x < (viewX + view.getWidth())) &&
+                (y > viewY && y < (viewY + view.getHeight()));
     }
 }

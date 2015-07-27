@@ -144,7 +144,7 @@ public class ToolbarDemoActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     switch (button) {
                         case CHOOSE_COLOR:
-                            toolbar.showPanel(1); // CUR move 1 somewhere
+                            toolbar.showPanel(1);
                             break;
                         case COLOR_1:
                         case COLOR_2:

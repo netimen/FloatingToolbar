@@ -40,6 +40,10 @@ public class ImageZoomActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private Rect initialImageBounds;
+    /**
+     * zoom image is visible and animation has finished
+     */
+    private boolean zoomImageActive;
 
     @AfterViews
     void ready() {
@@ -58,38 +62,48 @@ public class ImageZoomActivity extends AppCompatActivity {
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 Log.e(LOG_TAG, "AAAA onScroll " + distanceX + " " + distanceY);
-                if (zoomImage.getVisibility() == View.VISIBLE)
+                if (zoomImageActive)
                     zoomImage.move(-distanceX, -distanceY); // when I move finger right, distanceX is < 0 for some reason; same for Y
                 return super.onScroll(e1, e2, distanceX, distanceY);
             }
 
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                hideZoomImage();
+                if (zoomImageActive)
+                    hideZoomImage();
                 return super.onSingleTapConfirmed(e);
             }
         });
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            /**
-             * https://developer.android.com/reference/android/view/ScaleGestureDetector.html#getFocusX() will return nonsense in onScaleEnd, so we need to store values ourselves
-             */
-            private float focusX, focusY;
+            private boolean firstScaleAfterBegin = true;
+            private boolean ignoreRestOfScaling;
 
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                focusX = detector.getFocusX();
-                focusY = detector.getFocusY();
-                if (zoomImage.getVisibility() == View.VISIBLE)
-                    zoomImage.scale(detector.getScaleFactor());
-                return false;
+                final float scaleFactor = detector.getScaleFactor();
+
+                if (firstScaleAfterBegin) {
+                    firstScaleAfterBegin = false;
+
+                    if (!zoomImageActive && scaleFactor > 1) {
+                        zoomImageAtPoint(detector.getFocusX(), detector.getFocusY());
+                        ignoreRestOfScaling = true;
+                    } else if (zoomImageActive && scaleFactor < 1 && !zoomImage.isUpScaled()) {
+                        hideZoomImage();
+                        ignoreRestOfScaling = true;
+                    }
+                }
+
+                if (!ignoreRestOfScaling && (detector.getScaleFactor() > 1 || zoomImage.isUpScaled()))
+                    zoomImage.scale(scaleFactor);
+
+                return true;
             }
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
-                if (zoomImage.getVisibility() != View.VISIBLE && detector.getScaleFactor() > 1)
-                    zoomImageAtPoint(focusX, focusY);
-                else if (zoomImage.getVisibility() == View.VISIBLE && detector.getScaleFactor() < 1)
-                    hideZoomImage();
+                ignoreRestOfScaling = false;
+                firstScaleAfterBegin = true;
             }
 
         });
@@ -97,6 +111,7 @@ public class ImageZoomActivity extends AppCompatActivity {
 
     private void hideZoomImage() {
         Animations.showAndMove(zoomImage, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), initialImageBounds, false);
+        zoomImageActive = false;
     }
 
     private void zoomImageAtPoint(float x, float y) {
@@ -105,12 +120,17 @@ public class ImageZoomActivity extends AppCompatActivity {
             zoomImage(imageToZoom.getDrawable(), new Rect(imageToZoom.getLeft(), imageToZoom.getTop(), imageToZoom.getRight(), imageToZoom.getBottom()));
     }
 
-    private void zoomImage(Drawable drawable, Rect imageBounds) {
+    private void zoomImage(Drawable drawable, final Rect imageBounds) {
         zoomImage.setImageDrawable(drawable);
         zoomImage.reset();
         zoomImage.setVisibility(View.VISIBLE);
         initialImageBounds = imageBounds;
-        Animations.showAndMove(zoomImage, imageBounds, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), true);
+        Animations.showAndMove(zoomImage, imageBounds, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), true, new Runnable() {
+            @Override
+            public void run() {
+                zoomImageActive = true;
+            }
+        });
     }
 
     @Override

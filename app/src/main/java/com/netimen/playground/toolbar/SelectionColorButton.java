@@ -45,7 +45,7 @@ public class SelectionColorButton extends ToggleButton {
         textRenderer = new TextCenterRenderer(getContext().getString(R.string.selection_quote));
         textRenderer.onMeasure(innerRadius);
 
-        setupColors(Color.WHITE); // CUR
+        setupColors(Color.WHITE);
     }
 
     @Override

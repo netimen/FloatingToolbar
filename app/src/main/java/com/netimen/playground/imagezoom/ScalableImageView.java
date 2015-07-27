@@ -31,14 +31,19 @@ public class ScalableImageView extends ImageView {
         if (scaleFactor <= 1)
             return;
 
+        startScalingIfNeeded();
+
+        final float scale = initialScale * scaleFactor;
+        matrix.setScale(scale, scale);
+        matrix.postTranslate((getWidth() - getDrawable().getIntrinsicWidth() * scale) / 2, (getHeight() - getDrawable().getIntrinsicHeight() * scale) / 2); // current drawable size = intrinsic size * scale
+        setImageMatrix(matrix);
+    }
+
+    private void startScalingIfNeeded() {
         if (getScaleType() != ScaleType.MATRIX) {
             float w = getWidth(), h = getHeight(), dw = getDrawable().getIntrinsicWidth(), dh = getDrawable().getIntrinsicHeight();
             initialScale = Math.min(Math.min(w / dw, h / dh), 1);
             setScaleType(ScaleType.MATRIX);
         }
-        final float scale = initialScale * scaleFactor;
-        matrix.setScale(scale, scale);
-        matrix.postTranslate((getWidth() - getDrawable().getIntrinsicHeight()) / 2, (getHeight() - getDrawable().getIntrinsicHeight()) / 2);
-        setImageMatrix(matrix);
     }
 }

@@ -7,10 +7,10 @@
  */
 package com.netimen.playground.imagezoom;
 
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -32,7 +32,7 @@ public class ImageZoomActivity extends AppCompatActivity {
     ImageView smallPicture, bigPicture;
 
     @ViewById
-    ScalableImageView zoomImage;
+    MovableImageView zoomImage;
 
     @ViewById
     ViewGroup mainContainer;
@@ -40,7 +40,6 @@ public class ImageZoomActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private Rect initialImageBounds;
-    private Matrix imageMatrix;
 
     @AfterViews
     void ready() {
@@ -54,6 +53,14 @@ public class ImageZoomActivity extends AppCompatActivity {
             @Override
             public void onLongPress(MotionEvent e) {
                 super.onLongPress(e);
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                Log.e(LOG_TAG, "AAAA onScroll " + distanceX + " " + distanceY);
+                if (zoomImage.getVisibility() == View.VISIBLE)
+                    zoomImage.move(-distanceX, -distanceY); // when I move finger right, distanceX is < 0 for some reason; same for Y
+                return super.onScroll(e1, e2, distanceX, distanceY);
             }
 
             @Override
@@ -72,9 +79,8 @@ public class ImageZoomActivity extends AppCompatActivity {
             public boolean onScale(ScaleGestureDetector detector) {
                 focusX = detector.getFocusX();
                 focusY = detector.getFocusY();
-                if (zoomImage.getVisibility() == View.VISIBLE) {
+                if (zoomImage.getVisibility() == View.VISIBLE)
                     zoomImage.scale(detector.getScaleFactor());
-                }
                 return false;
             }
 
@@ -101,7 +107,7 @@ public class ImageZoomActivity extends AppCompatActivity {
 
     private void zoomImage(Drawable drawable, Rect imageBounds) {
         zoomImage.setImageDrawable(drawable);
-        zoomImage.resetScale();
+        zoomImage.reset();
         zoomImage.setVisibility(View.VISIBLE);
         initialImageBounds = imageBounds;
         Animations.showAndMove(zoomImage, imageBounds, new Rect(0, 0, mainContainer.getWidth(), mainContainer.getHeight()), true);

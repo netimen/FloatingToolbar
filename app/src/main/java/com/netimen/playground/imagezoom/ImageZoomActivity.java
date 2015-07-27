@@ -32,18 +32,16 @@ public class ImageZoomActivity extends AppCompatActivity {
     ImageView smallPicture, bigPicture;
 
     @ViewById
-    MovableImageView zoomImage;
+    MovableImageView movableImage;
+
+    @ViewById
+    ZoomableViewContainer zoomImage;
 
     @ViewById
     ViewGroup mainContainer;
 
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
-    private Rect initialImageBounds;
-    /**
-     * zoom image is visible and animation has finished
-     */
-    private boolean zoomImageActive;
 
     @AfterViews
     void ready() {
@@ -149,4 +147,4 @@ public class ImageZoomActivity extends AppCompatActivity {
         return (x > viewX && x < (viewX + view.getWidth())) &&
                 (y > viewY && y < (viewY + view.getHeight()));
     }
-}
+} // ImageZoomer, InputMode, ZoomImageHelper, MoveImageHelper

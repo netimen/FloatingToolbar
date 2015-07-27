@@ -42,6 +42,7 @@ public class Animations {
         layoutParams.height = startBounds.height();
         view.requestLayout();
 
+        view.animate().start();
         ValueAnimator anim = ValueAnimator.ofPropertyValuesHolder(
                 PropertyValuesHolder.ofInt("l", startBounds.left, endBounds.left),
                 PropertyValuesHolder.ofInt("t", startBounds.top, endBounds.top),
@@ -79,6 +80,7 @@ public class Animations {
                 layoutParams.width = (int) valueAnimator.getAnimatedValue("w");
                 layoutParams.height = (int) valueAnimator.getAnimatedValue("h");
                 view.requestLayout();
+//                view.getBackground().setAlpha((int) (valueAnimator.getAnimatedFraction() * 255));
             }
         });
         anim.start();
